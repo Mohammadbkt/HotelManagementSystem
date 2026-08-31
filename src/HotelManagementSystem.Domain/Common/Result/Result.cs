@@ -10,10 +10,21 @@ namespace HotelManagementSystem.Domain.Common.Result
 {
     public sealed class Result
     {
-        public static Success Success => default;
-        public static Created Created => default;
-        public static Updated Updated => default;
-        public static Deleted Deleted => default;
+        private readonly List<Error>? _errors;
+
+        public bool IsSuccess { get; }
+        public bool IsError => !IsSuccess;
+        public List<Error> Errors => IsError ? _errors! : [];
+        public Error? TopError => IsError ? _errors![0] : null;
+
+        private Result() => IsSuccess = true;
+        private Result(Error error) { _errors = [error]; IsSuccess = false; }
+
+        public static Result Success() => new();
+        public static Result Failure(Error error) => new(error);
+
+        public static implicit operator Result(Error error) => new(error);
+
     }
 
     public sealed class Result<TValue> : IResult<TValue>
@@ -118,8 +129,4 @@ namespace HotelManagementSystem.Domain.Common.Result
 
     }
 
-    public readonly record struct Success;
-    public readonly record struct Created;
-    public readonly record struct Updated;
-    public readonly record struct Deleted;
 }
