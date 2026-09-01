@@ -6,7 +6,7 @@ using HotelManagementSystem.Domain.Common.Result;
 
 namespace HotelManagementSystem.Domain.Entities.Rooms
 {
-    public class RoomErrors
+    public static class RoomErrors
     {
 
         public static Error InvalidHotelId => 
