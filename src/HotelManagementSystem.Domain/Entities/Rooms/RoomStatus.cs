@@ -3,12 +3,10 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
     public enum RoomStatus
     {
         Available,
-        Reserved,
+        CleanVacant,
+        DirtyVacant,
         Occupied,
         Maintenance,
-        OutOfService,
-        CleanVacant, 
-        DirtyVacant, 
         OutOfOrder
     }
 }

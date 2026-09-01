@@ -14,7 +14,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         public string RoomNumber { get; private set; } = string.Empty;
         public RoomStatus Status { get; private set; }
         public Guid CategoryId { get; private set; }
-        public string? Notes { get; private set; }
+        public string? StatusReason { get; private set; }
 
         private Room() { }
 
@@ -23,6 +23,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             HotelId = hotelId;
             RoomNumber = roomNumber;
             CategoryId = categoryId;
+            Status = RoomStatus.CleanVacant;
         }
 
         public static Result<Room> Create(Guid hotelId, string roomNumber, Guid categoryId)
@@ -44,7 +45,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
 
         public Result CheckIn()
         {
-            if (Status != RoomStatus.Available && Status != RoomStatus.CleanVacant)
+            if (Status != RoomStatus.CleanVacant)
                 return RoomErrors.RoomNotAvailable;
 
             Status = RoomStatus.Occupied;
@@ -74,7 +75,10 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             if (Status == RoomStatus.Occupied)
                 return RoomErrors.CannotTakeOccupiedRoomOutOfOrder;
 
-            Notes = reason;
+            if (reason?.Trim().Length > 500)
+                return RoomErrors.StatusReasonTooLong;
+
+            StatusReason = reason?.Trim();
             Status = RoomStatus.OutOfOrder;
             return Result.Success();
         }
@@ -84,7 +88,8 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             if (Status != RoomStatus.OutOfOrder && Status != RoomStatus.Maintenance)
                 return RoomErrors.RoomNotOutOfOrder;
 
-            Status = RoomStatus.Available;
+            Status = RoomStatus.CleanVacant;
+            StatusReason = null;
             return Result.Success();
         }
 
@@ -93,7 +98,11 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             if (Status == RoomStatus.Occupied)
                 return RoomErrors.CannotMoveOccupiedToMaintenance;
 
-            Notes = reason;
+            if (reason?.Trim().Length > 500)
+                return RoomErrors.StatusReasonTooLong;
+
+
+            StatusReason = reason?.Trim();
             Status = RoomStatus.Maintenance;
             return Result.Success();
         }

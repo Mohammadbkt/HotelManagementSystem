@@ -41,7 +41,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms.RoomCategories
             if (name.Trim().Length > 100)
                 return RoomCategoryErrors.NameTooLong;
 
-            if (description?.Length > 500)
+            if (description?.Trim().Length > 500)
                 return RoomCategoryErrors.DescriptionTooLong;
 
             if (maxCapacity <= 0)
@@ -67,7 +67,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms.RoomCategories
             if (name.Trim().Length > 100)
                 return RoomCategoryErrors.NameTooLong;
 
-            if (description?.Length > 500)
+            if (description?.Trim().Length > 500)
                 return RoomCategoryErrors.DescriptionTooLong;
 
             if (maxCapacity <= 0)

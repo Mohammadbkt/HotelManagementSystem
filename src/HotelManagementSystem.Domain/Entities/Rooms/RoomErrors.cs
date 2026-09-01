@@ -49,6 +49,11 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             Error.Validation(
                 "Room.NotOutOfOrder", 
                 "Room is not out of order.");
+        public static Error StatusReasonTooLong =>
+            Error.Validation(
+                "Room.StatusReasonTooLong",
+                "Status reason is too long"); 
+
     }
 
 }
