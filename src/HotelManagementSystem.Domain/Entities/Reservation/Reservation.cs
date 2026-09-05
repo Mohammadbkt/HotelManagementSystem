@@ -19,7 +19,7 @@ namespace HotelManagementSystem.Domain.Entities.Reservation
         {
         }
 
-        private Reservation(Guid guestId, Guid roomId, DateOnly checkInDate, DateOnly checkOutDate)
+        private Reservation(Guid id, Guid guestId, Guid roomId, DateOnly checkInDate, DateOnly checkOutDate) : base(id)
         {
             GuestId = guestId;
             RoomId = roomId;
@@ -37,7 +37,7 @@ namespace HotelManagementSystem.Domain.Entities.Reservation
             if (checkInDate >= checkOutDate)
                 return ReservationErrors.InvalidCheckInOutDates;
 
-            return new Reservation(guestId, roomId, checkInDate, checkOutDate);
+            return new Reservation(Guid.NewGuid(), guestId, roomId, checkInDate, checkOutDate);
         }
 
         public Result Update(Guid roomId, DateOnly checkInDate, DateOnly checkOutDate)

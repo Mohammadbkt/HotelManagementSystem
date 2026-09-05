@@ -14,17 +14,32 @@ namespace HotelManagementSystem.Domain.Common.Result
 
         public bool IsSuccess { get; }
         public bool IsError => !IsSuccess;
-        public List<Error> Errors => IsError ? _errors! : [];
+
         public Error? TopError => IsError ? _errors![0] : null;
+        public IReadOnlyList<Error> Errors => IsError ? _errors! : [];
 
         private Result() => IsSuccess = true;
         private Result(Error error) { _errors = [error]; IsSuccess = false; }
+        private Result(List<Error> errors)
+        {
+            if (errors is null || errors.Count == 0)
+            {
+                throw new ArgumentException(
+                    "Provide at least one error.",
+                    nameof(errors));
+            }
+
+            _errors = errors;
+            IsSuccess = false;
+        }
+
 
         public static Result Success() => new();
         public static Result Failure(Error error) => new(error);
+        public static Result Failure(IReadOnlyList<Error> errors) => new(errors.ToList());
 
         public static implicit operator Result(Error error) => new(error);
-
+        public static implicit operator Result(List<Error> errors) => new(errors);
     }
 
     public sealed class Result<TValue> : IResult<TValue>
@@ -35,6 +50,7 @@ namespace HotelManagementSystem.Domain.Common.Result
 
         public TValue Value => IsSuccess ? _value : throw new InvalidOperationException("The value of a failure result cannot be accessed.");
         public bool IsSuccess { get; }
+        public bool IsError => !IsSuccess;
         public IReadOnlyList<Error> Errors => _errors.AsReadOnly();
 
 
