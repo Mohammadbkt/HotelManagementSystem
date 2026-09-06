@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common.Result;
 
-namespace HotelManagementSystem.Domain.Entities.Reservation
+namespace HotelManagementSystem.Domain.Entities.Reservations
 {
     public static class ReservationErrors
     {
@@ -35,6 +35,11 @@ namespace HotelManagementSystem.Domain.Entities.Reservation
             Error.Validation(
                 "Reservation.CannotConfirmReservation", 
                 "Reservation is not pending.");
+
+            public static Error CannotCheckIn =>
+            Error.Validation(
+                "Reservation.CannotCheckIn", 
+                "Reservation is not confirmed.");
     
     }
 }

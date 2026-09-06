@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
 
-namespace HotelManagementSystem.Domain.Entities.Reservation
+namespace HotelManagementSystem.Domain.Entities.Reservations
 {
     public sealed class Reservation : AuditableEntity
     {
@@ -74,6 +74,15 @@ namespace HotelManagementSystem.Domain.Entities.Reservation
 
             Status = ReservationStatus.Cancelled;
 
+            return Result.Success();
+        }
+
+        public Result MarkAsCheckedIn()
+        {
+            if(Status != ReservationStatus.Confirmed)
+                return ReservationErrors.CannotCheckIn;
+
+            Status = ReservationStatus.CheckedIn;
             return Result.Success();
         }
     }

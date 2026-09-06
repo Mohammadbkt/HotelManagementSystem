@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
+using HotelManagementSystem.Domain.Entities.Reservations;
 
 namespace HotelManagementSystem.Domain.Entities.Stay
 {
@@ -55,7 +56,26 @@ namespace HotelManagementSystem.Domain.Entities.Stay
 
             CheckOutDate = checkOutDate;
 
+            AddDomainEvent(new StayCheckedOutEvent(Id, GuestId, RoomId, checkOutDate));
+
+
             return Result.Success();
+        }
+
+        public static Result<Stay> CreateFromReservation(Reservation reservation, DateTimeOffset checkInDate)
+        {
+            if (reservation.GuestId == Guid.Empty)
+                return StayErrors.InvalidGuestId;
+            if (reservation.RoomId == Guid.Empty)
+                return StayErrors.InvalidRoomId;
+
+            if (checkInDate == default)
+                return StayErrors.InvalidCheckInDate;
+
+            if (reservation.Id == Guid.Empty)
+                return StayErrors.InvalidReservationId;
+
+            return new Stay(Guid.NewGuid(), reservation.GuestId, reservation.RoomId, checkInDate, null, reservation.Id);
         }
     }
 }

@@ -114,6 +114,9 @@ public sealed class Invoice : AuditableEntity
         IssuedAt = issuedAt;
         Status = InvoiceStatus.Issued;
 
+        AddDomainEvent(new InvoiceIssuedEvent(Id, GuestId, issuedAt));
+
+
         return Result.Success();
     }
 

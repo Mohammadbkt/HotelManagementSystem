@@ -10,28 +10,37 @@ namespace HotelManagementSystem.Domain.Entities.Stay
     {
         public static Error InvalidGuestId =>
             Error.Validation(
-                "Stay.InvalidGuestId", 
+                "Stay.InvalidGuestId",
                 "Invalid guest ID.");
-            
-        public static Error InvalidRoomId => 
+
+        public static Error InvalidRoomId =>
             Error.Validation(
-                "Stay.InvalidRoomId", 
+                "Stay.InvalidRoomId",
                 "Invalid room ID.");
-                
+
         public static Error AlreadyCheckedOut =>
             Error.Validation(
-                "Stay.AlreadyCheckedOut", 
+                "Stay.AlreadyCheckedOut",
                 "The stay has already been checked out.");
 
         public static Error InvalidCheckOutTime =>
             Error.Validation(
-                "Stay.InvalidCheckOutTime", 
+                "Stay.InvalidCheckOutTime",
                 "The check-out time cannot be earlier than the check-in time.");
-        
+
         public static Error InvalidCheckInDate =>
-            Error.Validation(   
-                "Stay.InvalidCheckInDate", 
+            Error.Validation(
+                "Stay.InvalidCheckInDate",
                 "The check-in date is invalid.");
+
+        public static Error InvalidReservationId =>
+            Error.Validation(
+                "Stay.InvalidReservationId",
+                "Invalid reservation ID.");
+
+        public static Error NotCheckedOutYet =>
+            Error.Validation(
+                "Stay.NotCheckedOutYet",
+                "Cannot generate an invoice for a stay that has not been checked out.");
     }
 }
-           

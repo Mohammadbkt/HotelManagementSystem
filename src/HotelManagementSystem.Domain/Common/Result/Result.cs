@@ -117,6 +117,16 @@ namespace HotelManagementSystem.Domain.Common.Result
 
         }
 
+        public static Result<TValue> Success(TValue value) => new(value);
+
+        public static Result<TValue> Failure(Error error) => new(error);
+
+        public static Result<TValue> Failure(IReadOnlyList<Error> errors)
+            => new(errors.ToList());
+
+        public static Result<TValue> Failure(List<Error> errors)
+            => new(errors);
+
         public Error TopError => IsSuccess ? throw new InvalidOperationException(
                 "A successful result has no errors.")
             : _errors[0];
@@ -141,6 +151,7 @@ namespace HotelManagementSystem.Domain.Common.Result
 
         public static implicit operator Result<TValue>(List<Error> errors)
             => new(errors);
+
 
 
     }
