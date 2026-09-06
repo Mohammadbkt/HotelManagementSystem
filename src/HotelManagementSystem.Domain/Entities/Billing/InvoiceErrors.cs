@@ -43,12 +43,25 @@ public static class InvoiceErrors
     public static readonly Error CannotPayInvoice = Error.Validation(
         "Invoice.CannotPayInvoice",
         "Cannot pay an invoice that is not in issued status");
-    
+
     public static readonly Error InvalidPaidAt = Error.Validation(
         "Invoice.PaidAt.Invalid",
-        "PaidAt is invalid");   
+        "PaidAt is invalid");
 
-     public static readonly Error CannotIssue = Error.Validation(
-        "Invoice.CannotIssue",
-        "Cannot issue an invoice that is not in draft status");
+    public static readonly Error CannotIssue = Error.Validation(
+       "Invoice.CannotIssue",
+       "Cannot issue an invoice that is not in draft status");
+
+    public static readonly Error CannotModifyEmptyInvoice = Error.Validation(
+    "Invoice.CannotModifyEmptyInvoice",
+    "Cannot apply a discount or tax before adding line items");
+    
+
+    public static readonly Error DiscountExceedsSubtotal = Error.Validation(
+    "Invoice.DiscountExceedsSubtotal",
+    "Discount cannot exceed the invoice subtotal");
+
+    public static readonly Error IncorrectPaymentAmount = Error.Validation(
+        "Invoice.IncorrectPaymentAmount",
+        "Payment amount must exactly match the invoice total");
 }

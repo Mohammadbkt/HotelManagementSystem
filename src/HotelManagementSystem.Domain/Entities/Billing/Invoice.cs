@@ -1,5 +1,6 @@
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
+using HotelManagementSystem.Domain.Entities.Billing.Payments;
 using HotelManagementSystem.Domain.ValueObjects.Money;
 
 namespace HotelManagementSystem.Domain.Entities.Billing;
@@ -23,6 +24,8 @@ public sealed class Invoice : AuditableEntity
     public Money DiscountAmount { get; private set; }
     public Money TaxAmount { get; private set; }
     public Money TotalAmount { get; private set; }
+
+    public Payment? Payment { get; private set; }
 
     // EF Core
     private Invoice()
@@ -114,7 +117,7 @@ public sealed class Invoice : AuditableEntity
         return Result.Success();
     }
 
-    public Result MarkAsPaid(DateTimeOffset paidAt)
+    public Result Pay(Guid receivedByUserId, DateTimeOffset paidAt)
     {
         if (Status == InvoiceStatus.Paid)
             return InvoiceErrors.AlreadyPaid;
@@ -131,6 +134,17 @@ public sealed class Invoice : AuditableEntity
         if (IssuedAt.HasValue && paidAt < IssuedAt.Value)
             return InvoiceErrors.InvalidPaidAt;
 
+        var paymentResult = Payment.CreateCashPayment(
+            Id,
+            GuestId,
+            receivedByUserId,
+            TotalAmount,
+            paidAt);
+
+        if (paymentResult.IsError)
+            return Result.Failure(paymentResult.Errors);
+
+        Payment = paymentResult.Value;
         PaidAt = paidAt;
         Status = InvoiceStatus.Paid;
 
@@ -186,5 +200,45 @@ public sealed class Invoice : AuditableEntity
         }
 
         TotalAmount = total.Value;
+    }
+
+    public Result ApplyDiscount(Money discount)
+    {
+        if (Status != InvoiceStatus.Draft)
+            return InvoiceErrors.CannotModifyInvoice;
+
+        if (_lineItems.Count == 0)
+            return InvoiceErrors.CannotModifyEmptyInvoice;
+
+
+        if (discount.Currency != SubTotal.Currency)
+            return MoneyErrors.CurrencyMismatch;
+
+        if (SubTotal.Subtract(discount).IsError)
+            return InvoiceErrors.DiscountExceedsSubtotal;
+
+        DiscountAmount = discount;
+        RecalculateTotals();
+
+        return Result.Success();
+    }
+
+    public Result ApplyTax(Money tax)
+    {
+        if (Status != InvoiceStatus.Draft)
+            return InvoiceErrors.CannotModifyInvoice;
+
+        if (_lineItems.Count == 0)
+            return InvoiceErrors.CannotModifyEmptyInvoice;
+
+
+        if (tax.Currency != SubTotal.Currency)
+            return MoneyErrors.CurrencyMismatch;
+
+        TaxAmount = tax;
+
+        RecalculateTotals();
+
+        return Result.Success();
     }
 }
