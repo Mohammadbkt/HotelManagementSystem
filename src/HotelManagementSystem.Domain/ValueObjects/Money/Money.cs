@@ -63,10 +63,10 @@ public readonly record struct Money
             Currency);
     }
 
-    public Money Multiply(int quantity)
+    public Result<Money> Multiply(int quantity)
     {
         if (quantity < 0)
-            throw new ArgumentOutOfRangeException(nameof(quantity));
+            return MoneyErrors.AmountNegative;
 
         return new Money(
             decimal.Round(Amount * quantity, 2),

@@ -167,7 +167,7 @@ public sealed class Invoice : AuditableEntity
         return Result.Success();
     }
 
-    private void RecalculateTotals()
+    private Result RecalculateTotals()
     {
         var subtotal = Money.Zero(SubTotal.Currency);
 
@@ -177,8 +177,7 @@ public sealed class Invoice : AuditableEntity
 
             if (result.IsError)
             {
-                throw new InvalidOperationException(
-                    "Invoice contains line items with different currencies.");
+                return Result.Failure(result.Errors);
             }
 
             subtotal = result.Value;
@@ -190,19 +189,18 @@ public sealed class Invoice : AuditableEntity
 
         if (afterDiscount.IsError)
         {
-            throw new InvalidOperationException(
-                "Invoice discount cannot exceed subtotal.");
+            return Result.Failure(afterDiscount.Errors);
         }
 
         var total = afterDiscount.Value.Add(TaxAmount);
 
         if (total.IsError)
         {
-            throw new InvalidOperationException(
-                "Invoice contains amounts with different currencies.");
+            return Result.Failure(total.Errors);
         }
 
         TotalAmount = total.Value;
+        return Result.Success();
     }
 
     public Result ApplyDiscount(Money discount)

@@ -10,36 +10,40 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
     {
         public static Error InvalidGuestId =>
             Error.Validation(
-                "Reservation.InvalidGuestId", 
+                "Reservation.InvalidGuestId",
                 "Invalid guest ID.");
-        public static Error InvalidRoomId => 
+        public static Error InvalidRoomId =>
         Error.Validation(
-            "Reservation.InvalidRoomId", 
+            "Reservation.InvalidRoomId",
             "Invalid room ID.");
-        public static  Error InvalidCheckInOutDates => 
+        public static Error InvalidCheckInOutDates =>
             Error.Validation(
-                "Reservation.InvalidCheckInOutDates", 
+                "Reservation.InvalidCheckInOutDates",
                 "Invalid check-in and check-out dates.");
 
         public static Error ReservationAlreadyCancelled =>
             Error.Validation(
-                "Reservation.AlreadyCancelled", 
+                "Reservation.AlreadyCancelled",
                 "Reservation is already cancelled.");
 
         public static Error CannotUpdateReservation =>
             Error.Validation(
-                "Reservation.CannotUpdateReservation", 
+                "Reservation.CannotUpdateReservation",
                 "Reservation is not pending.");
 
         public static Error CannotConfirmReservation =>
             Error.Validation(
-                "Reservation.CannotConfirmReservation", 
+                "Reservation.CannotConfirmReservation",
                 "Reservation is not pending.");
 
-            public static Error CannotCheckIn =>
-            Error.Validation(
-                "Reservation.CannotCheckIn", 
-                "Reservation is not confirmed.");
-    
+        public static Error CannotCheckIn =>
+        Error.Validation(
+            "Reservation.CannotCheckIn",
+            "Reservation is not confirmed.");
+
+        public static readonly Error RoomAlreadyBooked = Error.Validation(
+            "Reservation.RoomAlreadyBooked",
+            "The room is already booked for an overlapping date range.");
+
     }
 }
