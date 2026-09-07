@@ -30,7 +30,7 @@ public sealed class InvoiceLineItem : Entity
         Quantity = quantity;
         LineNumber = lineNumber;
         UnitPrice = unitPrice;
-        LineTotal = unitPrice.Multiply(quantity);
+        LineTotal = unitPrice.Multiply(quantity).Value;
     }
 
     public static Result<InvoiceLineItem> Create(
