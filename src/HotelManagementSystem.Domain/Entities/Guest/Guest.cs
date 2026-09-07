@@ -40,45 +40,45 @@ public sealed class Guest : AuditableEntity
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         if (string.IsNullOrWhiteSpace(firstName))
-            return GuestErrors.FirstNameRequired;
+            return Result<Guest>.Failure(GuestErrors.FirstNameRequired);
 
         if (firstName.Trim().Length > 50)
-            return GuestErrors.FirstNameTooLong;
+            return Result<Guest>.Failure(GuestErrors.FirstNameTooLong);
 
         if (string.IsNullOrWhiteSpace(lastName))
-            return GuestErrors.LastNameRequired;
+            return Result<Guest>.Failure(GuestErrors.LastNameRequired);
 
         if (lastName.Trim().Length > 50)
-            return GuestErrors.LastNameTooLong;
+            return Result<Guest>.Failure(GuestErrors.LastNameTooLong);
 
         if (dateOfBirth > today)
-            return GuestErrors.InvalidDateOfBirth;
+            return Result<Guest>.Failure(GuestErrors.InvalidDateOfBirth);
 
         if (dateOfBirth < today.AddYears(-150))
-            return GuestErrors.InvalidDateOfBirth;
+            return Result<Guest>.Failure(GuestErrors.InvalidDateOfBirth);
 
-        return new Guest(
+        return Result<Guest>.Success(new Guest(
             Guid.NewGuid(),
             firstName.Trim(),
             lastName.Trim(),
             email,
             phoneNumber,
-            dateOfBirth);
+            dateOfBirth));
     }
 
     public Result UpdateName(string firstName, string lastName)
     {
         if (string.IsNullOrWhiteSpace(firstName))
-            return GuestErrors.FirstNameRequired;
+            return Result.Failure(GuestErrors.FirstNameRequired);
 
         if (firstName.Trim().Length > 50)
-            return GuestErrors.FirstNameTooLong;
+            return Result.Failure(GuestErrors.FirstNameTooLong);
 
         if (string.IsNullOrWhiteSpace(lastName))
-            return GuestErrors.LastNameRequired;
+            return Result.Failure(GuestErrors.LastNameRequired);
 
         if (lastName.Trim().Length > 50)
-            return GuestErrors.LastNameTooLong;
+            return Result.Failure(GuestErrors.LastNameTooLong);
 
         FirstName = firstName.Trim();
         LastName = lastName.Trim();

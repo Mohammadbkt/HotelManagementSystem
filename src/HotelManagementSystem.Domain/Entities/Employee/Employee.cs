@@ -34,31 +34,31 @@ namespace HotelManagementSystem.Domain.Entities.Employee
         {
             if (hotelId == Guid.Empty)
             {
-                return EmployeeErrors.HotelIdRequired;
+                return Result<Employee>.Failure(EmployeeErrors.HotelIdRequired);
             }
 
             if (string.IsNullOrWhiteSpace(firstName))
             {
-                return EmployeeErrors.FirstNameRequired;
+                return Result<Employee>.Failure(EmployeeErrors.FirstNameRequired);
             }
 
             if (string.IsNullOrWhiteSpace(lastName))
             {
-                return EmployeeErrors.LastNameRequired;
+                return Result<Employee>.Failure(EmployeeErrors.LastNameRequired);
             }
 
             if (!Enum.IsDefined(role))
             {
-                return EmployeeErrors.RoleInvalid;
+                return Result<Employee>.Failure(EmployeeErrors.RoleInvalid);
             }
 
-            return new Employee(Guid.NewGuid(), hotelId, firstName.Trim(), lastName.Trim(), phoneNumber, emailAddress, role);
+            return Result<Employee>.Success(new Employee(Guid.NewGuid(), hotelId, firstName.Trim(), lastName.Trim(), phoneNumber, emailAddress, role));
         }
 
         public Result ChangeRole(EmployeeRole role)
         {
             if (!Enum.IsDefined(role))
-                return EmployeeErrors.RoleInvalid;
+                return Result.Failure(EmployeeErrors.RoleInvalid);
 
             Role = role;
             return Result.Success();

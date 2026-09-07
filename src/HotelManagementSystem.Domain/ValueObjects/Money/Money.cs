@@ -18,19 +18,19 @@ public readonly record struct Money
         string currency)
     {
         if (amount < 0)
-            return MoneyErrors.AmountNegative;
+            return Result<Money>.Failure(MoneyErrors.AmountNegative);
 
         if (string.IsNullOrWhiteSpace(currency))
-            return MoneyErrors.CurrencyRequired;
+            return Result<Money>.Failure(MoneyErrors.CurrencyRequired);
 
         var formattedCurrency = currency.Trim().ToUpperInvariant();
 
         if (formattedCurrency.Length != 3)
-            return MoneyErrors.InvalidCurrency;
+            return Result<Money>.Failure(MoneyErrors.InvalidCurrency);
 
-        return new Money(
+        return Result<Money>.Success(new Money(
             decimal.Round(amount, 2),
-            formattedCurrency);
+            formattedCurrency));
     }
 
     public static Money Zero(string currency = "JOD")
@@ -43,34 +43,34 @@ public readonly record struct Money
     public Result<Money> Add(Money other)
     {
         if (Currency != other.Currency)
-            return MoneyErrors.CurrencyMismatch;
+            return Result<Money>.Failure(MoneyErrors.CurrencyMismatch);
 
-        return new Money(
+        return Result<Money>.Success(new Money(
             decimal.Round(Amount + other.Amount, 2),
-            Currency);
+            Currency));
     }
 
     public Result<Money> Subtract(Money other)
     {
         if (Currency != other.Currency)
-            return MoneyErrors.CurrencyMismatch;
+            return Result<Money>.Failure(MoneyErrors.CurrencyMismatch);
 
         if (Amount < other.Amount)
-            return MoneyErrors.AmountNegative;
+            return Result<Money>.Failure(MoneyErrors.AmountNegative);
 
-        return new Money(
+        return Result<Money>.Success(new Money(
             decimal.Round(Amount - other.Amount, 2),
-            Currency);
+            Currency));
     }
 
     public Result<Money> Multiply(int quantity)
     {
         if (quantity < 0)
-            return MoneyErrors.AmountNegative;
+            return Result<Money>.Failure(MoneyErrors.AmountNegative);
 
-        return new Money(
+        return Result<Money>.Success(new Money(
             decimal.Round(Amount * quantity, 2),
-            Currency);
+            Currency));
     }
 
     public override string ToString()

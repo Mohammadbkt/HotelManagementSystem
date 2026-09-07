@@ -52,25 +52,25 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
             string? notes = null)
         {
             if (invoiceId == Guid.Empty)
-                return PaymentErrors.InvalidInvoiceId;
+                return Result<Payment>.Failure(PaymentErrors.InvalidInvoiceId);
 
             if (guestId == Guid.Empty)
-                return PaymentErrors.InvalidGuestId;
+                return Result<Payment>.Failure(PaymentErrors.InvalidGuestId);
 
             if (amount.Amount <= 0)
-                return PaymentErrors.InvalidAmount;
+                return Result<Payment>.Failure(PaymentErrors.InvalidAmount);
 
             if (paymentDate == default)
-                return PaymentErrors.InvalidPaidAt;
+                return Result<Payment>.Failure(PaymentErrors.InvalidPaidAt);
 
-            return new Payment(
+            return Result<Payment>.Success(new Payment(
                 Guid.NewGuid(),
                 invoiceId,
                 guestId,
                 receivedByUserId,
                 amount,
                 paymentDate,
-                notes);
+                notes));
         }
     }
 }

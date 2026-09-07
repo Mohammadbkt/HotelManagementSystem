@@ -29,24 +29,23 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         public static Result<Room> Create(Guid hotelId, string roomNumber, Guid categoryId)
         {
             if (hotelId == Guid.Empty)
-                return RoomErrors.InvalidHotelId;
+                return Result<Room>.Failure(RoomErrors.InvalidHotelId);
             if (string.IsNullOrWhiteSpace(roomNumber))
-                return RoomErrors.RoomNumberRequired;
+                return Result<Room>.Failure(RoomErrors.RoomNumberRequired);
 
             if (roomNumber.Trim().Length > 20)
-                return RoomErrors.RoomNumberTooLong;
+                return Result<Room>.Failure(RoomErrors.RoomNumberTooLong);
 
             if (categoryId == Guid.Empty)
-                return RoomErrors.InvalidCategoryId;
+                return Result<Room>.Failure(RoomErrors.InvalidCategoryId);
 
-            return new Room(Guid.NewGuid(), hotelId, roomNumber.Trim(), categoryId);
-
+            return Result<Room>.Success(new Room(Guid.NewGuid(), hotelId, roomNumber.Trim(), categoryId));
         }
 
         public Result CheckIn()
         {
             if (Status != RoomStatus.CleanVacant)
-                return RoomErrors.RoomNotAvailable;
+                return Result.Failure(RoomErrors.RoomNotAvailable);
 
             Status = RoomStatus.Occupied;
             return Result.Success();
@@ -55,7 +54,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         public Result CheckOut()
         {
             if (Status != RoomStatus.Occupied)
-                return RoomErrors.RoomNotOccupied;
+                return Result.Failure(RoomErrors.RoomNotOccupied);
 
             Status = RoomStatus.DirtyVacant;
             return Result.Success();
@@ -64,7 +63,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         public Result MarkAsClean()
         {
             if (Status != RoomStatus.DirtyVacant)
-                return RoomErrors.RoomNotDirty;
+                return Result.Failure(RoomErrors.RoomNotDirty);
 
             Status = RoomStatus.CleanVacant;
             return Result.Success();
@@ -73,10 +72,10 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         public Result TakeOutOfOrder(string? reason)
         {
             if (Status == RoomStatus.Occupied)
-                return RoomErrors.CannotTakeOccupiedRoomOutOfOrder;
+                return Result.Failure(RoomErrors.CannotTakeOccupiedRoomOutOfOrder);
 
             if (reason?.Trim().Length > 500)
-                return RoomErrors.StatusReasonTooLong;
+                return Result.Failure(RoomErrors.StatusReasonTooLong);
 
             StatusReason = reason?.Trim();
             Status = RoomStatus.OutOfOrder;
@@ -86,7 +85,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         public Result ReturnToService()
         {
             if (Status != RoomStatus.OutOfOrder && Status != RoomStatus.Maintenance)
-                return RoomErrors.RoomNotOutOfOrder;
+                return Result.Failure(RoomErrors.RoomNotOutOfOrder);
 
             Status = RoomStatus.CleanVacant;
             StatusReason = null;
@@ -96,10 +95,10 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         public Result MoveToMaintenance(string? reason)
         {
             if (Status == RoomStatus.Occupied)
-                return RoomErrors.CannotMoveOccupiedToMaintenance;
+                return Result.Failure(RoomErrors.CannotMoveOccupiedToMaintenance);
 
             if (reason?.Trim().Length > 500)
-                return RoomErrors.StatusReasonTooLong;
+                return Result.Failure(RoomErrors.StatusReasonTooLong);
 
 
             StatusReason = reason?.Trim();

@@ -36,6 +36,6 @@ public static class InvoiceGenerationService
         if (lineItemResult.IsError)
             return Result<Invoice>.Failure(lineItemResult.Errors);
 
-        return invoice;
+        return Result<Invoice>.Success(invoice);
     }
 }

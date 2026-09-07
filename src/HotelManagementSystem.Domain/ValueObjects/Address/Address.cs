@@ -38,39 +38,39 @@ namespace HotelManagementSystem.Domain.ValueObjects.Address
             string? postalCode = null)
         {
             if (string.IsNullOrWhiteSpace(addressLine1))
-                return AddressErrors.AddressLine1Empty;
+                return Result<Address>.Failure(AddressErrors.AddressLine1Empty);
 
             if (string.IsNullOrWhiteSpace(city))
-                return AddressErrors.CityEmpty;
+                return Result<Address>.Failure(AddressErrors.CityEmpty);
 
             if (string.IsNullOrWhiteSpace(country))
-                return AddressErrors.CountryEmpty;
+                return Result<Address>.Failure(AddressErrors.CountryEmpty);
 
             if (addressLine1.Trim().Length > 200)
-                return AddressErrors.AddressLine1TooLong;
+                return Result<Address>.Failure(AddressErrors.AddressLine1TooLong);
 
             if (addressLine2?.Trim().Length > 200)
-                return AddressErrors.AddressLine2TooLong;
+                return Result<Address>.Failure(AddressErrors.AddressLine2TooLong);
 
             if (city.Trim().Length > 100)
-                return AddressErrors.CityTooLong;
+                return Result<Address>.Failure(AddressErrors.CityTooLong);
 
             if (stateOrProvince?.Trim().Length > 100)
-                return AddressErrors.StateOrProvinceTooLong;
+                return Result<Address>.Failure(AddressErrors.StateOrProvinceTooLong);
 
             if (postalCode?.Trim().Length > 20)
-                return AddressErrors.PostalCodeTooLong;
+                return Result<Address>.Failure(AddressErrors.PostalCodeTooLong);
 
             if (country.Trim().Length > 100)
-                return AddressErrors.CountryTooLong;
+                return Result<Address>.Failure(AddressErrors.CountryTooLong);
 
-            return new Address(
+            return Result<Address>.Success(new Address(
                 addressLine1.Trim(),
                 string.IsNullOrWhiteSpace(addressLine2) ? null : addressLine2.Trim(),
                 city.Trim(),
                 string.IsNullOrWhiteSpace(stateOrProvince) ? null : stateOrProvince.Trim(),
                 string.IsNullOrWhiteSpace(postalCode) ? null : postalCode.Trim(),
-                country.Trim());
+                country.Trim()));
         }
 
         public override string ToString()

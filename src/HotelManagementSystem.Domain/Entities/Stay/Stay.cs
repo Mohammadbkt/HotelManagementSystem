@@ -32,27 +32,27 @@ namespace HotelManagementSystem.Domain.Entities.Stay
         public static Result<Stay> Create(Guid guestId, Guid roomId, DateTimeOffset checkInDate, Guid? reservationId = null)
         {
             if (guestId == Guid.Empty)
-                return StayErrors.InvalidGuestId;
+                return Result<Stay>.Failure(StayErrors.InvalidGuestId);
             if (roomId == Guid.Empty)
-                return StayErrors.InvalidRoomId;
+                return Result<Stay>.Failure(StayErrors.InvalidRoomId);
 
             if (checkInDate == default)
-                return StayErrors.InvalidCheckInDate;
+                return Result<Stay>.Failure(StayErrors.InvalidCheckInDate);
 
 
-            return new Stay(Guid.NewGuid(), guestId, roomId, checkInDate, null, reservationId);
+            return Result<Stay>.Success(new Stay(Guid.NewGuid(), guestId, roomId, checkInDate, null, reservationId));
         }
 
         public Result CheckOut(DateTimeOffset checkOutDate)
         {
             if (CheckOutDate.HasValue)
-                return StayErrors.AlreadyCheckedOut;
+                return Result.Failure(StayErrors.AlreadyCheckedOut);
 
             if (checkOutDate == default)
-                return StayErrors.InvalidCheckOutTime;
+                return Result.Failure(StayErrors.InvalidCheckOutTime);
 
             if (checkOutDate < CheckInDate)
-                return StayErrors.InvalidCheckOutTime;
+                return Result.Failure(StayErrors.InvalidCheckOutTime);
 
             CheckOutDate = checkOutDate;
 
@@ -65,20 +65,20 @@ namespace HotelManagementSystem.Domain.Entities.Stay
         public static Result<Stay> CreateFromReservation(Reservation reservation, DateTimeOffset checkInDate)
         {
             if(reservation.Status != ReservationStatus.Confirmed)
-                return StayErrors.InvalidReservationStatus;
+                return Result<Stay>.Failure(StayErrors.InvalidReservationStatus);
 
             if (reservation.GuestId == Guid.Empty)
-                return StayErrors.InvalidGuestId;
+                return Result<Stay>.Failure(StayErrors.InvalidGuestId);
             if (reservation.RoomId == Guid.Empty)
-                return StayErrors.InvalidRoomId;
+                return Result<Stay>.Failure(StayErrors.InvalidRoomId);
 
             if (checkInDate == default)
-                return StayErrors.InvalidCheckInDate;
+                return Result<Stay>.Failure(StayErrors.InvalidCheckInDate);
 
             if (reservation.Id == Guid.Empty)
-                return StayErrors.InvalidReservationId;
+                return Result<Stay>.Failure(StayErrors.InvalidReservationId);
 
-            return new Stay(Guid.NewGuid(), reservation.GuestId, reservation.RoomId, checkInDate, null, reservation.Id);
+            return Result<Stay>.Success(new Stay(Guid.NewGuid(), reservation.GuestId, reservation.RoomId, checkInDate, null, reservation.Id));
         }
     }
 }

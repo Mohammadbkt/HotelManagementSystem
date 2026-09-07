@@ -17,14 +17,14 @@ namespace HotelManagementSystem.Domain.ValueObjects.Email
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                return EmailAddressErrors.Empty;
+                return Result<EmailAddress>.Failure(EmailAddressErrors.Empty);
             }
 
             value = value.Trim();
 
             if (value.Length > 254)
             {
-                return EmailAddressErrors.TooLong;
+                return Result<EmailAddress>.Failure(EmailAddressErrors.TooLong);
             }
 
             if (!Regex.IsMatch(
@@ -32,12 +32,12 @@ namespace HotelManagementSystem.Domain.ValueObjects.Email
                     @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
                     RegexOptions.CultureInvariant))
             {
-                return EmailAddressErrors.InvalidFormat;
+                return Result<EmailAddress>.Failure(EmailAddressErrors.InvalidFormat);
             }
 
             var normalizedValue = value.ToLowerInvariant();
 
-            return new EmailAddress(normalizedValue);
+            return Result<EmailAddress>.Success(new EmailAddress(normalizedValue));
         }
 
         public override string ToString() => Value;

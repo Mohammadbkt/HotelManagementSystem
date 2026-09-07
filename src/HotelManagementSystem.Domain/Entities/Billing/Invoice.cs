@@ -56,19 +56,19 @@ public sealed class Invoice : AuditableEntity
         string currencyCode = "JOD")
     {
         if (stayId == Guid.Empty)
-            return InvoiceErrors.InvalidStayId;
+            return Result<Invoice>.Failure(InvoiceErrors.InvalidStayId);
 
         if (guestId == Guid.Empty)
-            return InvoiceErrors.InvalidGuestId;
+            return Result<Invoice>.Failure(InvoiceErrors.InvalidGuestId);
 
         if (string.IsNullOrWhiteSpace(currencyCode))
-            return MoneyErrors.CurrencyRequired;
+            return Result<Invoice>.Failure(MoneyErrors.CurrencyRequired);
 
-        return new Invoice(
+        return Result<Invoice>.Success(new Invoice(
             Guid.NewGuid(),
             stayId,
             guestId,
-            currencyCode);
+            currencyCode));
     }
 
     public Result AddLineItem(
@@ -77,10 +77,10 @@ public sealed class Invoice : AuditableEntity
         Money unitPrice)
     {
         if (Status != InvoiceStatus.Draft)
-            return InvoiceErrors.CannotModifyInvoice;
+            return Result.Failure(InvoiceErrors.CannotModifyInvoice);
 
         if (unitPrice.Currency != SubTotal.Currency)
-            return MoneyErrors.CurrencyMismatch;
+            return Result.Failure(MoneyErrors.CurrencyMismatch);
 
         var lineNumber = _lineItems.Count + 1;
 
@@ -103,13 +103,13 @@ public sealed class Invoice : AuditableEntity
     public Result Issue(DateTimeOffset issuedAt)
     {
         if (Status != InvoiceStatus.Draft)
-            return InvoiceErrors.CannotIssue;
+            return Result.Failure(InvoiceErrors.CannotIssue);
 
         if (issuedAt == default)
-            return InvoiceErrors.InvalidIssuedAt;
+            return Result.Failure(InvoiceErrors.InvalidIssuedAt);
 
         if (_lineItems.Count == 0)
-            return InvoiceErrors.EmptyInvoice;
+            return Result.Failure(InvoiceErrors.EmptyInvoice);
 
         IssuedAt = issuedAt;
         Status = InvoiceStatus.Issued;
@@ -123,19 +123,19 @@ public sealed class Invoice : AuditableEntity
     public Result Pay(Guid receivedByUserId, DateTimeOffset paidAt)
     {
         if (Status == InvoiceStatus.Paid)
-            return InvoiceErrors.AlreadyPaid;
+            return Result.Failure(InvoiceErrors.AlreadyPaid);
 
         if (Status == InvoiceStatus.Cancelled)
-            return InvoiceErrors.CannotPayCancelled;
+            return Result.Failure(InvoiceErrors.CannotPayCancelled);
 
         if (Status != InvoiceStatus.Issued)
-            return InvoiceErrors.CannotPayInvoice;
+            return Result.Failure(InvoiceErrors.CannotPayInvoice);
 
         if (paidAt == default)
-            return InvoiceErrors.InvalidPaidAt;
+            return Result.Failure(InvoiceErrors.InvalidPaidAt);
 
         if (IssuedAt.HasValue && paidAt < IssuedAt.Value)
-            return InvoiceErrors.InvalidPaidAt;
+            return Result.Failure(InvoiceErrors.InvalidPaidAt);
 
         var paymentResult = Payment.CreateCashPayment(
             Id,
@@ -157,10 +157,10 @@ public sealed class Invoice : AuditableEntity
     public Result Cancel()
     {
         if (Status == InvoiceStatus.Paid)
-            return InvoiceErrors.CannotCancelPaidInvoice;
+            return Result.Failure(InvoiceErrors.CannotCancelPaidInvoice);
 
         if (Status == InvoiceStatus.Cancelled)
-            return InvoiceErrors.AlreadyCancelled;
+            return Result.Failure(InvoiceErrors.AlreadyCancelled);
 
         Status = InvoiceStatus.Cancelled;
 
@@ -206,17 +206,17 @@ public sealed class Invoice : AuditableEntity
     public Result ApplyDiscount(Money discount)
     {
         if (Status != InvoiceStatus.Draft)
-            return InvoiceErrors.CannotModifyInvoice;
+            return Result.Failure(InvoiceErrors.CannotModifyInvoice);
 
         if (_lineItems.Count == 0)
-            return InvoiceErrors.CannotModifyEmptyInvoice;
+            return Result.Failure(InvoiceErrors.CannotModifyEmptyInvoice);
 
 
         if (discount.Currency != SubTotal.Currency)
-            return MoneyErrors.CurrencyMismatch;
+            return Result.Failure(MoneyErrors.CurrencyMismatch);
 
         if (SubTotal.Subtract(discount).IsError)
-            return InvoiceErrors.DiscountExceedsSubtotal;
+            return Result.Failure(InvoiceErrors.DiscountExceedsSubtotal);
 
         DiscountAmount = discount;
         RecalculateTotals();
@@ -227,14 +227,14 @@ public sealed class Invoice : AuditableEntity
     public Result ApplyTax(Money tax)
     {
         if (Status != InvoiceStatus.Draft)
-            return InvoiceErrors.CannotModifyInvoice;
+            return Result.Failure(InvoiceErrors.CannotModifyInvoice);
 
         if (_lineItems.Count == 0)
-            return InvoiceErrors.CannotModifyEmptyInvoice;
+            return Result.Failure(InvoiceErrors.CannotModifyEmptyInvoice);
 
 
         if (tax.Currency != SubTotal.Currency)
-            return MoneyErrors.CurrencyMismatch;
+            return Result.Failure(MoneyErrors.CurrencyMismatch);
 
         TaxAmount = tax;
 

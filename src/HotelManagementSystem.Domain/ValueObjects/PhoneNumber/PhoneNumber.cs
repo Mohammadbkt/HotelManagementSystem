@@ -18,14 +18,14 @@ namespace HotelManagementSystem.Domain.ValueObjects.PhoneNumber
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                return PhoneNumberErrors.Empty;
+                return Result<PhoneNumber>.Failure(PhoneNumberErrors.Empty);
             }
 
             value = value.Trim();
 
             if (!Regex.IsMatch(value, @"^[\d\s\-\(\)\+]+$"))
             {
-                return PhoneNumberErrors.InvalidFormat;
+                return Result<PhoneNumber>.Failure(PhoneNumberErrors.InvalidFormat);
             }
 
             var digitsOnly = new string(
@@ -33,17 +33,17 @@ namespace HotelManagementSystem.Domain.ValueObjects.PhoneNumber
 
             if (digitsOnly.Length < 7 || digitsOnly.Length > 15)
             {
-                return PhoneNumberErrors.InvalidLength;
+                return Result<PhoneNumber>.Failure(PhoneNumberErrors.InvalidLength);
             }
 
             if (!value.StartsWith('+'))
             {
-                return PhoneNumberErrors.MissingCountryCode;
+                return Result<PhoneNumber>.Failure(PhoneNumberErrors.MissingCountryCode);
             }
 
             var normalizedValue = $"+{digitsOnly}";
 
-            return new PhoneNumber(normalizedValue);
+            return Result<PhoneNumber>.Success(new PhoneNumber(normalizedValue));
         }
 
         public override string ToString() => Value;

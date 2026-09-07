@@ -40,22 +40,22 @@ public sealed class InvoiceLineItem : Entity
         Money unitPrice)
     {
         if (string.IsNullOrWhiteSpace(description))
-            return InvoiceLineItemErrors.InvalidDescription;
+            return Result<InvoiceLineItem>.Failure(InvoiceLineItemErrors.InvalidDescription);
 
         if (quantity <= 0)
-            return InvoiceLineItemErrors.InvalidQuantity;
+            return Result<InvoiceLineItem>.Failure(InvoiceLineItemErrors.InvalidQuantity);
 
         if (lineNumber <= 0)
-            return InvoiceLineItemErrors.InvalidLineNumber;
+            return Result<InvoiceLineItem>.Failure(InvoiceLineItemErrors.InvalidLineNumber);
 
         if (unitPrice.Amount <= 0)
-            return InvoiceLineItemErrors.InvalidUnitPrice;
+            return Result<InvoiceLineItem>.Failure(InvoiceLineItemErrors.InvalidUnitPrice);
 
-        return new InvoiceLineItem(
+        return Result<InvoiceLineItem>.Success(new InvoiceLineItem(
             Guid.NewGuid(),
             description.Trim(),
             quantity,
             lineNumber,
-            unitPrice);
+            unitPrice));
     }
 }

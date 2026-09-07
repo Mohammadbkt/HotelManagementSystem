@@ -33,45 +33,45 @@ namespace HotelManagementSystem.Domain.Entities.Rooms.RoomCategories
         public static Result<RoomCategory> Create(Guid hotelId, string name, string? description, int maxCapacity, Money basePricePerNight)
         {
             if (hotelId == Guid.Empty)
-                return RoomCategoryErrors.InvalidHotelId;
+                return Result<RoomCategory>.Failure(RoomCategoryErrors.InvalidHotelId);
 
             if (string.IsNullOrWhiteSpace(name))
-                return RoomCategoryErrors.NameEmpty;
+                return Result<RoomCategory>.Failure(RoomCategoryErrors.NameEmpty);
 
             if (name.Trim().Length > 100)
-                return RoomCategoryErrors.NameTooLong;
+                return Result<RoomCategory>.Failure(RoomCategoryErrors.NameTooLong);
 
             if (description?.Trim().Length > 500)
-                return RoomCategoryErrors.DescriptionTooLong;
+                return Result<RoomCategory>.Failure(RoomCategoryErrors.DescriptionTooLong);
 
             if (maxCapacity <= 0)
-                return RoomCategoryErrors.InvalidMaxCapacity;
+                return Result<RoomCategory>.Failure(RoomCategoryErrors.InvalidMaxCapacity);
 
             if (basePricePerNight.Amount <= 0)
-                return RoomCategoryErrors.PriceMustBePositive;
+                return Result<RoomCategory>.Failure(RoomCategoryErrors.PriceMustBePositive);
 
-            return new RoomCategory(
+            return Result<RoomCategory>.Success(new RoomCategory(
                 Guid.NewGuid(),
                 hotelId,
                 name.Trim(),
                 description?.Trim(),
                 maxCapacity,
-                basePricePerNight);
+                basePricePerNight));
         }
 
         public Result UpdateDetails(string name, string? description, int maxCapacity)
         {
             if (string.IsNullOrWhiteSpace(name))
-                return RoomCategoryErrors.NameEmpty;
+                return Result.Failure(RoomCategoryErrors.NameEmpty);
 
             if (name.Trim().Length > 100)
-                return RoomCategoryErrors.NameTooLong;
+                return Result.Failure(RoomCategoryErrors.NameTooLong);
 
             if (description?.Trim().Length > 500)
-                return RoomCategoryErrors.DescriptionTooLong;
+                return Result.Failure(RoomCategoryErrors.DescriptionTooLong);
 
             if (maxCapacity <= 0)
-                return RoomCategoryErrors.InvalidMaxCapacity;
+                return Result.Failure(RoomCategoryErrors.InvalidMaxCapacity);
 
             Name = name.Trim();
             Description = description?.Trim();
@@ -83,7 +83,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms.RoomCategories
         public Result UpdateBasePrice(Money newPrice)
         {
             if (newPrice.Amount <= 0)
-                return RoomCategoryErrors.PriceMustBePositive;
+                return Result.Failure(RoomCategoryErrors.PriceMustBePositive);
 
             BasePricePerNight = newPrice;
             return Result.Success();

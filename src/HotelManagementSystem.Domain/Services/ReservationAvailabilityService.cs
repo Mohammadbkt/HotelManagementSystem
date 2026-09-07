@@ -16,7 +16,7 @@ public static class ReservationAvailabilityService
             && r.CheckInDate < checkOutDate);
 
         return hasOverlap
-            ? ReservationErrors.RoomAlreadyBooked
+            ? Result.Failure(ReservationErrors.RoomAlreadyBooked)
             : Result.Success();
     }
 

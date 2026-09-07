@@ -31,25 +31,25 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
         public static Result<Reservation> Create(Guid guestId, Guid roomId, DateOnly checkInDate, DateOnly checkOutDate)
         {
             if (guestId == Guid.Empty)
-                return ReservationErrors.InvalidGuestId;
+                return Result<Reservation>.Failure(ReservationErrors.InvalidGuestId);
             if (roomId == Guid.Empty)
-                return ReservationErrors.InvalidRoomId;
+                return Result<Reservation>.Failure(ReservationErrors.InvalidRoomId);
             if (checkInDate >= checkOutDate)
-                return ReservationErrors.InvalidCheckInOutDates;
+                return Result<Reservation>.Failure(ReservationErrors.InvalidCheckInOutDates);
 
-            return new Reservation(Guid.NewGuid(), guestId, roomId, checkInDate, checkOutDate);
+            return Result<Reservation>.Success(new Reservation(Guid.NewGuid(), guestId, roomId, checkInDate, checkOutDate));
         }
 
         public Result Update(Guid roomId, DateOnly checkInDate, DateOnly checkOutDate)
         {
             if (Status != ReservationStatus.Pending)
-                return ReservationErrors.CannotUpdateReservation;
+                return Result.Failure(ReservationErrors.CannotUpdateReservation);
 
             if (roomId == Guid.Empty)
-                return ReservationErrors.InvalidRoomId;
+                return Result.Failure(ReservationErrors.InvalidRoomId);
 
             if (checkInDate >= checkOutDate)
-                return ReservationErrors.InvalidCheckInOutDates;
+                return Result.Failure(ReservationErrors.InvalidCheckInOutDates);
 
             RoomId = roomId;
             CheckInDate = checkInDate;
@@ -61,7 +61,7 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
         public Result Confirm()
         {
             if (Status != ReservationStatus.Pending)
-                return ReservationErrors.CannotConfirmReservation;
+                return Result.Failure(ReservationErrors.CannotConfirmReservation);
             Status = ReservationStatus.Confirmed;
 
             return Result.Success();
@@ -70,7 +70,7 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
         public Result Cancel()
         {
             if (Status == ReservationStatus.Cancelled)
-                return ReservationErrors.ReservationAlreadyCancelled;
+                return Result.Failure(ReservationErrors.ReservationAlreadyCancelled);
 
             Status = ReservationStatus.Cancelled;
 
@@ -80,7 +80,7 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
         public Result MarkAsCheckedIn()
         {
             if(Status != ReservationStatus.Confirmed)
-                return ReservationErrors.CannotCheckIn;
+                return Result.Failure(ReservationErrors.CannotCheckIn);
 
             Status = ReservationStatus.CheckedIn;
             return Result.Success();

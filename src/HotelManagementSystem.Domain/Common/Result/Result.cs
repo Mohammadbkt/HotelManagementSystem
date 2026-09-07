@@ -38,8 +38,6 @@ namespace HotelManagementSystem.Domain.Common.Result
         public static Result Failure(Error error) => new(error);
         public static Result Failure(IReadOnlyList<Error> errors) => new(errors.ToList());
 
-        public static implicit operator Result(Error error) => new(error);
-        public static implicit operator Result(List<Error> errors) => new(errors);
     }
 
     public sealed class Result<TValue> : IResult<TValue>
@@ -143,14 +141,6 @@ namespace HotelManagementSystem.Domain.Common.Result
                 : onError(_errors);
         }
 
-        public static implicit operator Result<TValue>(TValue value)
-            => new(value);
-
-        public static implicit operator Result<TValue>(Error error)
-            => new(error);
-
-        public static implicit operator Result<TValue>(List<Error> errors)
-            => new(errors);
 
 
 

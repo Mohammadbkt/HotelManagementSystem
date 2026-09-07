@@ -8,8 +8,8 @@ namespace HotelManagementSystem.Domain.Entities.Hotel
     public sealed class Hotel : AuditableEntity
     {
         public string Name { get; private set; } = string.Empty;
-        public Address Address { get; private set; }
-        public PhoneNumber PhoneNumber { get; private set; }
+        public Address Address { get; private set; } = default!;
+        public PhoneNumber PhoneNumber { get; private set; } = default!;
 
         private Hotel()
         {
@@ -26,9 +26,25 @@ namespace HotelManagementSystem.Domain.Entities.Hotel
         public static Result<Hotel> Create(string name, Address address, PhoneNumber phone)
         {
             if (string.IsNullOrWhiteSpace(name))
-                return Error.Validation("Hotel.NameRequired", "Hotel name is required.");
+                return Result<Hotel>.Failure(Error.Validation("Hotel.NameRequired", "Hotel name is required."));
 
-            return new Hotel(Guid.NewGuid(), name.Trim(), address, phone);
+            return Result<Hotel>.Success(new Hotel(Guid.NewGuid(), name.Trim(), address, phone));
+        }
+
+        
+    public Result UpdateInfo(
+        string name,
+        Address address,
+        PhoneNumber phone)
+        {
+            if(string.IsNullOrWhiteSpace(name))
+                return Result.Failure(Error.Validation("Hotel.NameRequired", "Hotel name is required."));
+            
+            Name = name.Trim();
+            Address = address;
+            PhoneNumber = phone;
+
+            return Result.Success();
         }
 
     }
