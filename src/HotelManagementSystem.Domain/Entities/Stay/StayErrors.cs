@@ -42,5 +42,10 @@ namespace HotelManagementSystem.Domain.Entities.Stay
             Error.Validation(
                 "Stay.NotCheckedOutYet",
                 "Cannot generate an invoice for a stay that has not been checked out.");
+        
+        public static Error InvalidReservationStatus =>
+            Error.Validation(
+                "Stay.InvalidReservationStatus",
+                "Cannot create a stay from a reservation that is not confirmed.");
     }
 }

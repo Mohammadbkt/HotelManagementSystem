@@ -1,14 +1,12 @@
 namespace HotelManagementSystem.Domain.Common;
 
-using MediatR;
-
 public abstract class Entity
 {
     public Guid Id { get; private set; }
 
     private readonly List<DomainEvent> _domainEvents = [];
 
-    public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+    public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents;
 
     protected Entity()
     { }
@@ -32,5 +30,23 @@ public abstract class Entity
     public void ClearDomainEvents()
     {
         _domainEvents.Clear();
+    }
+
+    override public bool Equals(object? obj)
+    {
+        if (obj is not Entity other)
+            return false;
+
+        if (Id == Guid.Empty || other.Id == Guid.Empty)
+            return false;
+
+        return GetType() == other.GetType()
+            && Id == other.Id;
+
+    }
+
+    override public int GetHashCode()
+    {
+        return HashCode.Combine(GetType(), Id);
     }
 }

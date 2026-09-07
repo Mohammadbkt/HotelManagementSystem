@@ -64,6 +64,9 @@ namespace HotelManagementSystem.Domain.Entities.Stay
 
         public static Result<Stay> CreateFromReservation(Reservation reservation, DateTimeOffset checkInDate)
         {
+            if(reservation.Status != ReservationStatus.Confirmed)
+                return StayErrors.InvalidReservationStatus;
+
             if (reservation.GuestId == Guid.Empty)
                 return StayErrors.InvalidGuestId;
             if (reservation.RoomId == Guid.Empty)

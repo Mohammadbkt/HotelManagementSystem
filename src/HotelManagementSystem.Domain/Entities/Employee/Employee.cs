@@ -30,13 +30,8 @@ namespace HotelManagementSystem.Domain.Entities.Employee
             Role = role;
         }
 
-        public static Result<Employee> Create(Guid id, Guid hotelId, string firstName, string lastName, PhoneNumber? phoneNumber, EmailAddress emailAddress, EmployeeRole role)
+        public static Result<Employee> Create(Guid hotelId, string firstName, string lastName, PhoneNumber? phoneNumber, EmailAddress emailAddress, EmployeeRole role)
         {
-            if (id == Guid.Empty)
-            {
-                return EmployeeErrors.IdRequired;
-            }
-
             if (hotelId == Guid.Empty)
             {
                 return EmployeeErrors.HotelIdRequired;
@@ -57,7 +52,7 @@ namespace HotelManagementSystem.Domain.Entities.Employee
                 return EmployeeErrors.RoleInvalid;
             }
 
-            return new Employee(id, hotelId, firstName.Trim(), lastName.Trim(), phoneNumber, emailAddress, role);
+            return new Employee(Guid.NewGuid(), hotelId, firstName.Trim(), lastName.Trim(), phoneNumber, emailAddress, role);
         }
 
         public Result ChangeRole(EmployeeRole role)
