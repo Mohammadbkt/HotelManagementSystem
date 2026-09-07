@@ -3,7 +3,7 @@ using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.ValueObjects.Address;
 using HotelManagementSystem.Domain.ValueObjects.PhoneNumber;
 
-namespace HotelManagementSystem.Domain.Entities.Hotel
+namespace HotelManagementSystem.Domain.Entities.Hotels
 {
     public sealed class Hotel : AuditableEntity
     {
