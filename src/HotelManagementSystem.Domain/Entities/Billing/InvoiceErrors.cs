@@ -61,7 +61,4 @@ public static class InvoiceErrors
     "Invoice.DiscountExceedsSubtotal",
     "Discount cannot exceed the invoice subtotal");
 
-    public static readonly Error IncorrectPaymentAmount = Error.Validation(
-        "Invoice.IncorrectPaymentAmount",
-        "Payment amount must exactly match the invoice total");
 }
