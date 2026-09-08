@@ -14,13 +14,17 @@ namespace HotelManagementSystem.Application.Features.Hotels.Commands.CreateHotel
 
         public async Task<Result<Guid>> Handle(CreateHotelCommand request, CancellationToken cancellationToken)
         {
-            var addressResult = Address.Create(request.Street, request.City, request.Country);
+            var addressResult = Address.Create(
+            request.AddressLine1, request.City, request.Country,
+            request.AddressLine2, request.StateOrProvince, request.PostalCode);
+            
             if(addressResult.IsError)
             {
                 return Result<Guid>.Failure(addressResult.Errors);
             }
 
-            var phoneResult = PhoneNumber.Create(request.Phone);
+            var phoneResult = PhoneNumber.Create(request.PhoneNumber);
+
             if(phoneResult.IsError)
             {
                 return Result<Guid>.Failure(phoneResult.Errors);
@@ -32,7 +36,7 @@ namespace HotelManagementSystem.Application.Features.Hotels.Commands.CreateHotel
                 return Result<Guid>.Failure(hotelResult.Errors);
             }
 
-            _context.Hotels.Add(hotelResult.Value);
+            await _context.Hotels.AddAsync(hotelResult.Value);
             await _context.SaveChangesAsync(cancellationToken);
 
             return Result<Guid>.Success(hotelResult.Value.Id); 
