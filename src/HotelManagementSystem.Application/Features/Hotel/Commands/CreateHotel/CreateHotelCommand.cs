@@ -1,7 +1,7 @@
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
 
-namespace HotelManagementSystem.Application.Features.Hotel.Commands.CreateHotel
+namespace HotelManagementSystem.Application.Features.Hotels.Commands.CreateHotel
 {
     public sealed record CreateHotelCommand(
     string Name,

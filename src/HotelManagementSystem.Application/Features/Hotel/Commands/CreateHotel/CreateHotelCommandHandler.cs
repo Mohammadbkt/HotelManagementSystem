@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.ValueObjects.Address;
 using HotelManagementSystem.Domain.ValueObjects.PhoneNumber;
@@ -9,7 +5,7 @@ using HotelManagementSystem.Domain.Entities.Hotels;
 using MediatR;
 using HotelManagementSystem.Application.Common;
 
-namespace HotelManagementSystem.Application.Features.Hotel.Commands.CreateHotel
+namespace HotelManagementSystem.Application.Features.Hotels.Commands.CreateHotel
 {
     public sealed class CreateHotelCommandHandler(IAppDbContext context) : IRequestHandler<CreateHotelCommand, Result<Guid>>
     {
