@@ -17,7 +17,7 @@ namespace HotelManagementSystem.Application.Common
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<RoomCategory> RoomTypes { get; set; }
+        public DbSet<RoomCategory> RoomCategories { get; set; }
         public DbSet<Guest> Guests { get; set; }
         public DbSet<Stay> Stays { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
