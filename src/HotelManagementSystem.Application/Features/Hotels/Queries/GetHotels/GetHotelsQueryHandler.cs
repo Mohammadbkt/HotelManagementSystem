@@ -41,7 +41,7 @@ namespace HotelManagementSystem.Application.Features.Hotels.Queries.GetHotels
             var items = await query
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
-                .Select(HotelMappingExtensions.ToDtoExpression())
+                .ToHotelDto()
                 .ToListAsync(cancellationToken);
 
             var paginatedResult = new PaginatedList<HotelDto>
