@@ -21,7 +21,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms.RoomCategories
 
         }
 
-        private RoomCategory(Guid Id, Guid hotelId, string name, string? description, int maxCapacity, Money basePricePerNight) : base(Id)
+        private RoomCategory(Guid id, Guid hotelId, string name, string? description, int maxCapacity, Money basePricePerNight) : base(id)
         {
             HotelId = hotelId;
             Name = name;
