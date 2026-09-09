@@ -8,13 +8,13 @@ namespace HotelManagementSystem.Domain.Common.Result
     public readonly record struct Error
     {
         public string Code { get; }
-        public string Descreption { get; }
+        public string Description { get; }
         public ErrorKind Type { get; }
 
         private Error(string code, string description, ErrorKind type)
         {
             Code = code;
-            Descreption = description;
+            Description = description;
             Type = type;
         }
 

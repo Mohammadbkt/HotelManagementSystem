@@ -13,16 +13,16 @@ namespace HotelManagementSystem.Application.Common
 {
     public interface IAppDbContext 
     {
-        public DbSet<Hotel> Hotels { get; set; }
-        public DbSet<Employee> Employees { get; set; }
-        public DbSet<Room> Rooms { get; set; }
-        public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<RoomCategory> RoomCategories { get; set; }
-        public DbSet<Guest> Guests { get; set; }
-        public DbSet<Stay> Stays { get; set; }
-        public DbSet<Invoice> Invoices { get; set; }
-        public DbSet<InvoiceLineItem> InvoiceLineItems { get; set; }
-        public DbSet<Payment> Payments { get; set; }
+        public DbSet<Hotel> Hotels { get; }
+        public DbSet<Employee> Employees { get;  }
+        public DbSet<Room> Rooms { get; }
+        public DbSet<Reservation> Reservations { get; }
+        public DbSet<RoomCategory> RoomCategories { get; }
+        public DbSet<Guest> Guests { get; }
+        public DbSet<Stay> Stays { get; }
+        public DbSet<Invoice> Invoices { get; }
+        public DbSet<InvoiceLineItem> InvoiceLineItems { get; }
+        public DbSet<Payment> Payments { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         
