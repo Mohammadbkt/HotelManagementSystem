@@ -23,14 +23,14 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Commands.Cre
                 return Result<Guid>.Failure(Error.Conflict("RoomCategory.DuplicateName", "A room category with this name already exists for this hotel."));
 
 
-            var MoneyResult = Money.Create(request.BasePrice, request.Currency);
-            if (MoneyResult.IsError)
-                return Result<Guid>.Failure(MoneyResult.Errors);
+            var moneyResult = Money.Create(request.BasePrice, request.Currency);
+            if (moneyResult.IsError)
+                return Result<Guid>.Failure(moneyResult.Errors);
 
-            var roomCategoryResult = RoomCategory.Create(request.HotelId, request.Name, request.Description, request.MaxCapacity, MoneyResult.Value);
+            var roomCategoryResult = RoomCategory.Create(request.HotelId, request.Name, request.Description, request.MaxCapacity, moneyResult.Value);
 
             if (roomCategoryResult.IsError)
-                return Result<Guid>.Failure(Error.Unexpected());
+                return Result<Guid>.Failure(roomCategoryResult.Errors);
 
             await _context.RoomCategories.AddAsync(roomCategoryResult.Value, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);

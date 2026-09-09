@@ -14,8 +14,8 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Commands.Cre
                 .MaximumLength(100);
 
             RuleFor(x => x.Description)
-                .NotEmpty()
-                .MaximumLength(500);
+                .MaximumLength(500)
+                .When(x => x.Description is not null);
 
             RuleFor(x => x.MaxCapacity)
                 .GreaterThan(0);
