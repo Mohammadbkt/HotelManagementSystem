@@ -24,8 +24,6 @@ namespace HotelManagementSystem.Application.Features.Hotels.Mappers
 
         public static HotelDto ToDto(this Hotel hotel) => _compiledProjection(hotel);
 
-        public static Expression<Func<Hotel, HotelDto>> ToDtoExpression() => ProjectionExpression;
-
         public static IQueryable<HotelDto> ToHotelDto(this IQueryable<Hotel> query)
             => query.Select(ProjectionExpression);
     }
