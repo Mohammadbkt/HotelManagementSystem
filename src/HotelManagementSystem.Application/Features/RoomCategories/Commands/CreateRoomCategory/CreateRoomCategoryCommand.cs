@@ -10,7 +10,7 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Commands.Cre
     public sealed record CreateRoomCategoryCommand(
         Guid HotelId,
         string Name,
-        string Description,
+        string? Description,
         int MaxCapacity,
         decimal BasePrice,
         string Currency
