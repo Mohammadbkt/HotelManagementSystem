@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace HotelManagementSystem.Application.Features.RoomCategories.Queries.GetRoomCategoryById
 {
-    public sealed class GetRoomCategoryByIdCommandValidator : AbstractValidator<GetRoomCategoryByIdCommand>
+    public sealed class GetRoomCategoryByIdQueryValidator : AbstractValidator<GetRoomCategoryByIdQuery>
     {
-        public GetRoomCategoryByIdCommandValidator()
+        public GetRoomCategoryByIdQueryValidator()
         {
             RuleFor(x => x.RoomCategoryId)
                 .NotEmpty();
