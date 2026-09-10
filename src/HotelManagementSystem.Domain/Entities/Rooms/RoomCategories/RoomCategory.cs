@@ -8,7 +8,7 @@ using HotelManagementSystem.Domain.ValueObjects.Money;
 
 namespace HotelManagementSystem.Domain.Entities.Rooms.RoomCategories
 {
-    public sealed class RoomCategory : AuditableEntity
+    public sealed class RoomCategory : SoftDeletableEntity
     {
         public Guid HotelId { get; private set; }
         public string Name { get; private set; } = default!;

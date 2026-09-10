@@ -8,7 +8,7 @@ using HotelManagementSystem.Domain.ValueObjects.Money;
 
 namespace HotelManagementSystem.Domain.Entities.Rooms
 {
-    public sealed class Room : AuditableEntity
+    public sealed class Room : SoftDeletableEntity
     {
         public Guid HotelId { get; private set; }
         public string RoomNumber { get; private set; } = string.Empty;

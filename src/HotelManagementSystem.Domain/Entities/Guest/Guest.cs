@@ -5,7 +5,7 @@ using HotelManagementSystem.Domain.ValueObjects.PhoneNumber;
 
 namespace HotelManagementSystem.Domain.Entities.Guests;
 
-public sealed class Guest : AuditableEntity
+public sealed class Guest : SoftDeletableEntity
 {
     public string FirstName { get; private set; } = default!;
     public string LastName { get; private set; } = default!;
