@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
-using HotelManagementSystem.Domain.ValueObjects.Money;
 
 namespace HotelManagementSystem.Domain.Entities.Rooms
 {
@@ -13,7 +8,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         public Guid HotelId { get; private set; }
         public string RoomNumber { get; private set; } = string.Empty;
         public RoomStatus Status { get; private set; }
-        public Guid CategoryId { get; private set; }
+        public Guid RoomCategoryId { get; private set; }
         public string? StatusReason { get; private set; }
 
         private Room() { }
@@ -22,7 +17,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         {
             HotelId = hotelId;
             RoomNumber = roomNumber;
-            CategoryId = categoryId;
+            RoomCategoryId = categoryId;
             Status = RoomStatus.CleanVacant;
         }
 
@@ -74,10 +69,11 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             if (Status == RoomStatus.Occupied)
                 return Result.Failure(RoomErrors.CannotTakeOccupiedRoomOutOfOrder);
 
-            if (reason?.Trim().Length > 500)
-                return Result.Failure(RoomErrors.StatusReasonTooLong);
+            var reasonResult = ValidateStatusReason(reason);
+            if (reasonResult.IsError)
+                return Result.Failure(reasonResult.Errors);
 
-            StatusReason = reason?.Trim();
+            StatusReason = reasonResult.Value;
             Status = RoomStatus.OutOfOrder;
             return Result.Success();
         }
@@ -97,13 +93,21 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             if (Status == RoomStatus.Occupied)
                 return Result.Failure(RoomErrors.CannotMoveOccupiedToMaintenance);
 
-            if (reason?.Trim().Length > 500)
-                return Result.Failure(RoomErrors.StatusReasonTooLong);
+            var reasonResult = ValidateStatusReason(reason);
+            if (reasonResult.IsError)
+                return Result.Failure(reasonResult.Errors);
 
-
-            StatusReason = reason?.Trim();
+            StatusReason = reasonResult.Value;
             Status = RoomStatus.Maintenance;
             return Result.Success();
+        }
+
+        private static Result<string?> ValidateStatusReason(string? reason)
+        {
+            if (reason?.Trim().Length > 500)
+                return Result<string?>.Failure(RoomErrors.StatusReasonTooLong);
+
+            return Result<string?>.Success(reason?.Trim());
         }
 
     }
