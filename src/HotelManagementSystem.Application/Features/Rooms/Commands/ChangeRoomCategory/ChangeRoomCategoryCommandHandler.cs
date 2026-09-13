@@ -1,6 +1,8 @@
 using HotelManagementSystem.Application.Common;
 using HotelManagementSystem.Domain.Common.Result;
+using HotelManagementSystem.Domain.Entities.Reservations;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomCategory
 {
@@ -21,8 +23,27 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomCa
             if (roomCategory.HotelId != room.HotelId)
                 return Result.Failure(Error.Validation("Room.CategoryHotelMismatch", "The selected room category does not belong to this hotel."));
 
+            var hasActiveReservation = await _context.Reservations
+                                        .AnyAsync(r => r.RoomId == request.RoomId
+                                                && (
+                                                    r.Status == ReservationStatus.Confirmed
+                                                    || r.Status == ReservationStatus.CheckedIn
+                                                    || r.Status == ReservationStatus.Pending
+                                                ), cancellationToken);
 
-            //TODO:A room category cannot be changed while the room has an active stay or reservation that would be affected.
+            if (hasActiveReservation)
+                return Result.Failure(Error.Validation("Room.HasActiveReservation",
+                    "Cannot change category: the room has an active reservation."));
+
+            var hasActiveStay = await _context.Stays.AnyAsync(
+                s => s.RoomId == request.RoomId 
+                  && s.CheckOutDate == null,
+                cancellationToken
+            );
+
+            if (hasActiveStay)
+                return Result.Failure(Error.Validation("Room.HasActiveStay",
+                    "Cannot change category: the room has an active stay."));
 
             var categoryResult = room.ChangeCategory(request.RoomCategoryId);
             if (categoryResult.IsError)
