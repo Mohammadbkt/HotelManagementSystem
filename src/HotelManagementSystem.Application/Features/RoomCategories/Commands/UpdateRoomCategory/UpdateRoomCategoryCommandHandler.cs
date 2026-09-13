@@ -15,7 +15,7 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Commands.Upd
         private readonly IAppDbContext _context = context;
         public async Task<Result> Handle(UpdateRoomCategoryCommand request, CancellationToken cancellationToken)
         {
-            var roomCategory = await _context.RoomCategories.FindAsync(request.RoomCategoryId, cancellationToken);
+            var roomCategory = await _context.RoomCategories.FindAsync([request.RoomCategoryId], cancellationToken);
             if(roomCategory is null)
                 return Result.Failure(Error.NotFound());
 

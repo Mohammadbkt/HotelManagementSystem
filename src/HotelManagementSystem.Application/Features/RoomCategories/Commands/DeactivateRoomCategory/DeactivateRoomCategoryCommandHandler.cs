@@ -11,7 +11,7 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Commands.Dea
 
         public async Task<Result> Handle(DeactivateRoomCategoryCommand request, CancellationToken cancellationToken)
         {
-            var roomCategory = await _context.RoomCategories.FindAsync(request.RoomCategoryId, cancellationToken);
+            var roomCategory = await _context.RoomCategories.FindAsync([request.RoomCategoryId], cancellationToken);
             if (roomCategory is null)
                 return Result.Failure(Error.NotFound("RoomCategory.NotFound", "Room category not found."));
            

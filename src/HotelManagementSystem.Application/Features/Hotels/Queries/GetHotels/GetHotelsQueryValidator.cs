@@ -32,13 +32,19 @@ namespace HotelManagementSystem.Application.Features.Hotels.Queries.GetHotels
                 .WithMessage("Country cannot exceed 100 characters.");
 
             RuleFor(x => x.SortBy)
-                .Must(s => s is null || s.Equals("name", StringComparison.OrdinalIgnoreCase) 
+                .Must(s => s is null || s.Equals("name", StringComparison.OrdinalIgnoreCase)
                                      || s.Equals("city", StringComparison.OrdinalIgnoreCase))
                 .WithMessage("SortBy must be one of: name, city.");
 
             RuleFor(x => x.SortDirection)
                 .IsInEnum()
                 .WithMessage("SortDirection must be Ascending or Descending.");
+
+            RuleFor(x => x.PageNumber)
+                .GreaterThanOrEqualTo(1);
+
+            RuleFor(x => x.PageSize)
+                .InclusiveBetween(1, 100);
 
         }
     }

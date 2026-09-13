@@ -9,19 +9,13 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Queries.GetR
             RuleFor(x => x.HotelId)
                 .NotEmpty();
 
-            RuleFor(x => x.Name)
-                .MaximumLength(100)
-                .When(x => !string.IsNullOrWhiteSpace(x.Name))
-                .NotEmpty();
-
             RuleFor(x => x.SearchTerm)
                 .MaximumLength(100)
-                .When(x => !string.IsNullOrWhiteSpace(x.SearchTerm))
-                .NotEmpty();
+                .When(x => !string.IsNullOrWhiteSpace(x.SearchTerm));
 
             RuleFor(x => x.MaxCapacity)
-           .GreaterThan(0)
-           .When(x => x.MaxCapacity.HasValue);
+                .GreaterThan(0)
+                .When(x => x.MaxCapacity.HasValue);
 
             RuleFor(x => x.MinPricePerNight)
                 .GreaterThanOrEqualTo(0)

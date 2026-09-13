@@ -12,11 +12,15 @@ namespace HotelManagementSystem.Application.Features.Hotels.Queries.GetHotelById
         private readonly IAppDbContext _context = context;
         public async Task<Result<HotelDto>> Handle(GetHotelByIdQuery request, CancellationToken cancellationToken)
         {
-            var hotel = await _context.Hotels.SingleOrDefaultAsync(x => x.Id == request.HotelId, cancellationToken);
-            if(hotel is null)
-                return Result<HotelDto>.Failure(Error.NotFound("Hotel.NotFound", "Hotel not found."));
+            var hotelDto = await _context.Hotels
+                            .AsNoTracking()
+                            .Where(h => h.Id == request.HotelId)
+                            .ToHotelDto()
+                            .FirstOrDefaultAsync(cancellationToken);
 
-            var hotelDto = hotel.ToDto();
+            if (hotelDto is null)
+                return Result<HotelDto>.Failure(
+                    Error.NotFound("Hotel.NotFound", "Hotel not found."));
 
             return Result<HotelDto>.Success(hotelDto);
         }

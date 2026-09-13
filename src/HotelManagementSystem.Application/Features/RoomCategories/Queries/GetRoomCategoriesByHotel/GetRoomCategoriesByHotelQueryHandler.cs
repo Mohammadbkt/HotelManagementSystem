@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotelManagementSystem.Application.Common;
 using HotelManagementSystem.Application.Common.Models;
 using HotelManagementSystem.Application.Features.RoomCategories.Dtos;
@@ -46,6 +42,16 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Queries.GetR
 
             query = request.SortBy?.ToLowerInvariant() switch
             {
+
+                "maxcapacity" =>
+                    request.SortDirection == SortDirection.Ascending
+                        ? query.OrderBy(x => x.MaxCapacity)
+                        : query.OrderByDescending(x => x.MaxCapacity),
+
+                "price" =>
+                    request.SortDirection == SortDirection.Ascending
+                        ? query.OrderBy(x => x.BasePricePerNight.Amount)
+                        : query.OrderByDescending(x => x.BasePricePerNight.Amount),
 
                 _ => request.SortDirection == SortDirection.Ascending
                     ? query.OrderBy(rc => rc.Name)

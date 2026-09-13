@@ -11,7 +11,7 @@ namespace HotelManagementSystem.Application.Features.Hotels.Commands.UpdateHotel
         private readonly IAppDbContext _context = context;
         public async Task<Result> Handle(UpdateHotelCommand request, CancellationToken cancellationToken)
         {
-            var hotel = await _context.Hotels.FindAsync(request.HotelId, cancellationToken);
+            var hotel = await _context.Hotels.FindAsync([request.HotelId], cancellationToken);
             if (hotel is null)
                 return Result.Failure(Error.NotFound("Hotel.NotFound", "Hotel not found."));
 

@@ -11,7 +11,6 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Queries.GetR
 {
     public sealed record GetRoomCategoriesByHotelQuery(
         Guid HotelId,
-        string? Name,
         string? SearchTerm = null,
         int? MaxCapacity = null,
         decimal? MinPricePerNight = null,

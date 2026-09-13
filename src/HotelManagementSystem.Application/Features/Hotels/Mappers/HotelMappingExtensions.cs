@@ -20,7 +20,8 @@ namespace HotelManagementSystem.Application.Features.Hotels.Mappers
                 h.Address.Country,
                 h.PhoneNumber.Value);
 
-        private static readonly Func<Hotel, HotelDto> _compiledProjection = ProjectionExpression.Compile();
+        private static readonly Func<Hotel, HotelDto> _compiledProjection =
+            ProjectionExpression.Compile();
 
         public static HotelDto ToDto(this Hotel hotel) => _compiledProjection(hotel);
 
