@@ -52,7 +52,12 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
         public static Error StatusReasonTooLong =>
             Error.Validation(
                 "Room.StatusReasonTooLong",
-                "Status reason is too long"); 
+                "Status reason is too long."); 
+
+        public static Error CannotUpdateOccupiedRoom => 
+        Error.Validation(
+            "Room.CannotUpdateOccupiedRoom", 
+            "Cannot update details of an occupied room.");
 
     }
 

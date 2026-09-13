@@ -1,5 +1,6 @@
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
+using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
 
 namespace HotelManagementSystem.Domain.Entities.Rooms
 {
@@ -35,6 +36,37 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
                 return Result<Room>.Failure(RoomErrors.InvalidCategoryId);
 
             return Result<Room>.Success(new Room(Guid.NewGuid(), hotelId, roomNumber.Trim(), categoryId));
+        }
+
+        public Result ChangeRoomNumber(string roomNumber)
+        {
+            if (Status == RoomStatus.Occupied)
+                return Result.Failure(RoomErrors.CannotUpdateOccupiedRoom);
+
+
+            if (string.IsNullOrWhiteSpace(roomNumber))
+                return Result.Failure(RoomErrors.RoomNumberRequired);
+
+            if (roomNumber.Trim().Length > 20)
+                return Result.Failure(RoomErrors.RoomNumberTooLong);
+
+            RoomNumber = roomNumber.Trim();
+
+            return Result.Success();
+        }
+
+        public Result ChangeCategory(Guid roomCategoryId)
+        {
+            if (Status == RoomStatus.Occupied)
+                return Result.Failure(RoomErrors.CannotUpdateOccupiedRoom);
+
+
+            if (roomCategoryId == Guid.Empty)
+                return Result.Failure(RoomCategoryErrors.InvalidId);
+
+            RoomCategoryId = roomCategoryId;
+
+            return Result.Success();
         }
 
         public Result CheckIn()
