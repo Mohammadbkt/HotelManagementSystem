@@ -40,7 +40,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
 
         public Result ChangeRoomNumber(string roomNumber)
         {
-            if (Status == RoomStatus.Occupied)
+            if (Status != RoomStatus.CleanVacant)
                 return Result.Failure(RoomErrors.CannotUpdateOccupiedRoom);
 
 
@@ -62,7 +62,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
 
 
             if (roomCategoryId == Guid.Empty)
-                return Result.Failure(RoomCategoryErrors.InvalidId);
+                return Result.Failure(RoomErrors.InvalidCategoryId);
 
             RoomCategoryId = roomCategoryId;
 

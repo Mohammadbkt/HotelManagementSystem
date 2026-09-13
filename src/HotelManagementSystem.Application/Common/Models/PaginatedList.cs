@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+using Microsoft.EntityFrameworkCore;
 namespace HotelManagementSystem.Application.Common.Models
 {
     public sealed class PaginatedList<T>
@@ -15,7 +11,6 @@ namespace HotelManagementSystem.Application.Common.Models
 
         public bool HasPreviousPage => PageNumber > 1;
         public bool HasNextPage => PageNumber < TotalPages;
-
 
     }
 }
