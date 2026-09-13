@@ -12,11 +12,11 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomCa
 
         public async Task<Result> Handle(ChangeRoomCategoryCommand request, CancellationToken cancellationToken)
         {
-            var room = await _context.Rooms.FindAsync(request.RoomId, cancellationToken);
+            var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
             if (room is null)
                 return Result.Failure(Error.NotFound("Room.NotFound", "Room not found."));
 
-            var roomCategory = await _context.RoomCategories.FindAsync(request.RoomCategoryId, cancellationToken);
+            var roomCategory = await _context.RoomCategories.FindAsync([request.RoomCategoryId], cancellationToken);
             if (roomCategory is null)
                 return Result.Failure(Error.NotFound("RoomCategory.NotFound", "Room category not found."));
 

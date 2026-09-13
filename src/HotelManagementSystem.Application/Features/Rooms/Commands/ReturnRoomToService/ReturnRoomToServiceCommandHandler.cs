@@ -10,7 +10,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ReturnRoomTo
 
         public async Task<Result> Handle(ReturnRoomToServiceCommand request, CancellationToken cancellationToken)
         {
-             var room = await _context.Rooms.FindAsync(request.RoomId, cancellationToken);
+             var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
             if (room is null)
                 return Result.Failure(Error.NotFound("Room.NotFound", "Room not found"));
 

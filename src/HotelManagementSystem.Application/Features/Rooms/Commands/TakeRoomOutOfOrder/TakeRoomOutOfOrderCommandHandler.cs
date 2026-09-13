@@ -10,7 +10,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.TakeRoomOutO
 
         public async Task<Result> Handle(TakeRoomOutOfOrderCommand request, CancellationToken cancellationToken)
         {
-            var room = await _context.Rooms.FindAsync(request.RoomId, cancellationToken);
+            var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
             if(room is null)
                 return Result.Failure(Error.NotFound("Room.NotFound", "Room not found"));
 

@@ -9,9 +9,10 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.TakeRoomOutO
             RuleFor(x => x.RoomId)
                 .NotEmpty();
 
+                
             RuleFor(x => x.Reason)
                 .MaximumLength(500)
-                .When(x => string.IsNullOrWhiteSpace(x.Reason));
+                .When(x => !string.IsNullOrWhiteSpace(x.Reason));
         }
     }
 }

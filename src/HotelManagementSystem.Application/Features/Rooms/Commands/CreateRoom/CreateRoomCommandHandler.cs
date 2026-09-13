@@ -27,7 +27,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.CreateRoom
                 return Result<Guid>.Failure(Error.Conflict("Room.RoomNumberAlreadyExists", "A room with this number already exists in this hotel."));
 
             var roomCategory = await _context.RoomCategories
-                .FindAsync(request.RoomCategoryId, cancellationToken);
+                .FindAsync([request.RoomCategoryId], cancellationToken);
            
             if (roomCategory is null)
                 return Result<Guid>.Failure(Error.NotFound("RoomCategory.NotFound", "Room category not found"));
