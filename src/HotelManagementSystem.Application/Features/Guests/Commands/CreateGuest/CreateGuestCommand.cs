@@ -8,6 +8,6 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.CreateGuest
         string LastName,
         string? Email,
         string? Phone,
-        DateOnly DateOfBith
+        DateOnly DateOfBirth
     ) : IRequest<Result<Guid>>;
 }

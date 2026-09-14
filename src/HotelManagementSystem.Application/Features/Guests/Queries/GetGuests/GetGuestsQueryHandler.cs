@@ -45,7 +45,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Queries.GetGuests
                     : query.OrderByDescending(g => g.FirstName)
             };
 
-            var totalCount = await _context.Guests.CountAsync(cancellationToken);
+            var totalCount = await query.CountAsync(cancellationToken);
 
             var items = await query
                         .Skip((request.PageNumber - 1) * request.PageSize)

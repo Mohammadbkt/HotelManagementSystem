@@ -24,7 +24,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.CreateGuest
                 .Matches(@"^\+?[0-9\s\-()]+$")
                 .When(x => !string.IsNullOrWhiteSpace(x.Phone));
 
-            RuleFor(x => x.DateOfBith)
+            RuleFor(x => x.DateOfBirth)
                 .LessThan(DateOnly.FromDateTime(DateTime.UtcNow))
                 .WithMessage("Date of birth must be in the past.");
         }
