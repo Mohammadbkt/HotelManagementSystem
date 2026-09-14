@@ -27,4 +27,9 @@ public static class GuestErrors
     public static Error AtLeastOneContactRequired => Error.Validation(
         "Guest.AtLeastOneContactRequired",
         "At least one contact method (email or phone) is required.");
+
+    public static Error NotFound => 
+    Error.NotFound(
+        "Guest.NotFound",
+        " guest not found.");
 }

@@ -51,10 +51,7 @@ public sealed class Guest : SoftDeletableEntity
         if (lastName.Trim().Length > 50)
             return Result<Guest>.Failure(GuestErrors.LastNameTooLong);
 
-        if (dateOfBirth > today)
-            return Result<Guest>.Failure(GuestErrors.InvalidDateOfBirth);
-
-        if (dateOfBirth < today.AddYears(-150))
+        if (dateOfBirth > today || dateOfBirth < today.AddYears(-150))
             return Result<Guest>.Failure(GuestErrors.InvalidDateOfBirth);
 
         return Result<Guest>.Success(new Guest(
@@ -66,8 +63,10 @@ public sealed class Guest : SoftDeletableEntity
             dateOfBirth));
     }
 
-    public Result UpdateName(string firstName, string lastName)
+    public Result UpdateInfo(string firstName, string lastName, DateOnly dateOfBirth)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
         if (string.IsNullOrWhiteSpace(firstName))
             return Result.Failure(GuestErrors.FirstNameRequired);
 
@@ -80,8 +79,13 @@ public sealed class Guest : SoftDeletableEntity
         if (lastName.Trim().Length > 50)
             return Result.Failure(GuestErrors.LastNameTooLong);
 
+        if (dateOfBirth > today || dateOfBirth < today.AddYears(-150))
+            return Result.Failure(GuestErrors.InvalidDateOfBirth);
+
+
         FirstName = firstName.Trim();
         LastName = lastName.Trim();
+        DateOfBirth = dateOfBirth;
 
         return Result.Success();
     }
