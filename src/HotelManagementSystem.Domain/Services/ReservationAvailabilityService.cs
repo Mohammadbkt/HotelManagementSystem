@@ -21,5 +21,5 @@ public static class ReservationAvailabilityService
     }
 
     private static bool IsActive(ReservationStatus status)
-        => status is ReservationStatus.Pending or ReservationStatus.Confirmed;
+        => status is ReservationStatus.Pending or ReservationStatus.Confirmed or ReservationStatus.CheckedIn;
 }

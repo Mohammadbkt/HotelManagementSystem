@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
 
@@ -72,6 +68,9 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
             if (Status == ReservationStatus.Cancelled)
                 return Result.Failure(ReservationErrors.ReservationAlreadyCancelled);
 
+            if (Status == ReservationStatus.CheckedIn)
+                return Result.Failure(ReservationErrors.CannotCancelAfterCheckIn);
+
             Status = ReservationStatus.Cancelled;
 
             return Result.Success();
@@ -79,7 +78,7 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
 
         public Result MarkAsCheckedIn()
         {
-            if(Status != ReservationStatus.Confirmed)
+            if (Status != ReservationStatus.Confirmed)
                 return Result.Failure(ReservationErrors.CannotCheckIn);
 
             Status = ReservationStatus.CheckedIn;

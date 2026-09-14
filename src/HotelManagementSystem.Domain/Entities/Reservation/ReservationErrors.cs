@@ -45,5 +45,11 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
             "Reservation.RoomAlreadyBooked",
             "The room is already booked for an overlapping date range.");
 
+        public static readonly Error CannotCancelAfterCheckIn = Error.Validation(
+            "Reservation.CannotCancelAfterCheckIn",
+            "Cannot cancel a reservation after Check in.");
+
+
+
     }
 }
