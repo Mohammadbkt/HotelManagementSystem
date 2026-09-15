@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common;
 
-namespace HotelManagementSystem.Domain.Entities.Stay
+namespace HotelManagementSystem.Domain.Entities.Stays
 {
     public sealed class StayCheckedOutEvent: DomainEvent
     {

@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common.Result;
 
-namespace HotelManagementSystem.Domain.Entities.Stay
+namespace HotelManagementSystem.Domain.Entities.Stays
 {
     public static class StayErrors
     {

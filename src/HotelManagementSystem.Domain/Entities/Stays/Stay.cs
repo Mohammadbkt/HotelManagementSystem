@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Reservations;
 
-namespace HotelManagementSystem.Domain.Entities.Stay
+namespace HotelManagementSystem.Domain.Entities.Stays
 {
     public sealed class Stay : AuditableEntity
     {
