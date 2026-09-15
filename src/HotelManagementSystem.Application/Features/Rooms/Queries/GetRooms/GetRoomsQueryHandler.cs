@@ -42,7 +42,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Queries.GetRooms
                         .Skip((request.PageNumber - 1) * request.PageSize)
                         .Take(request.PageSize)
                         .ToRoomDto()
-                        .ToListAsync();
+                        .ToListAsync(cancellationToken);
 
             var paginatedResult = new PaginatedList<RoomDto>
             {
