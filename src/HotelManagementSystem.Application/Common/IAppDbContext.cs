@@ -6,7 +6,7 @@ using HotelManagementSystem.Domain.Entities.Hotels;
 using HotelManagementSystem.Domain.Entities.Reservations;
 using HotelManagementSystem.Domain.Entities.Rooms;
 using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
-using HotelManagementSystem.Domain.Entities.Stay;
+using HotelManagementSystem.Domain.Entities.Stays;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementSystem.Application.Common
