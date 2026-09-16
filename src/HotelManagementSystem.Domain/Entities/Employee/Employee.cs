@@ -11,7 +11,8 @@ namespace HotelManagementSystem.Domain.Entities.Employee
         public string FirstName { get; private set; } = default!;
         public string LastName { get; private set; } = default!;
         public PhoneNumber? PhoneNumber { get; private set; }
-        public EmailAddress? EmailAddress { get; private set; }
+        public EmailAddress EmailAddress { get; private set; }
+        public DateOnly DateOfBirth { get; private set; }
         public EmployeeRole Role { get; private set; }
         public string FullName => $"{FirstName} {LastName}";
 
@@ -64,7 +65,28 @@ namespace HotelManagementSystem.Domain.Entities.Employee
             return Result.Success();
         }
 
-        public Result UpdateContactInfo(PhoneNumber? phoneNumber, EmailAddress? emailAddress)
+        public Result UpdateInfo(string firstName, string lastName, DateOnly dateOfBirth)
+        {
+            if (string.IsNullOrWhiteSpace(firstName))
+                return Result.Failure(EmployeeErrors.FirstNameRequired);
+
+            if (string.IsNullOrWhiteSpace(lastName))
+                return Result.Failure(EmployeeErrors.LastNameRequired);
+
+            if (dateOfBirth == default)
+                return Result.Failure(EmployeeErrors.DateOfBirthRequired);
+
+            if (dateOfBirth >= DateOnly.FromDateTime(DateTime.UtcNow))
+                return Result.Failure(EmployeeErrors.DateOfBirthInvalid);
+
+            FirstName = firstName.Trim();
+            LastName = lastName.Trim();
+            DateOfBirth = dateOfBirth;
+
+            return Result.Success();
+        }
+
+        public Result UpdateContactInfo(PhoneNumber? phoneNumber, EmailAddress emailAddress)
         {
             PhoneNumber = phoneNumber;
             EmailAddress = emailAddress;

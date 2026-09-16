@@ -23,5 +23,14 @@ namespace HotelManagementSystem.Domain.Entities.Employee
         public static Error HotelIdRequired => Error.Validation(
             "Employee.HotelIdRequired",
             "Employee Hotel Id is required");
+
+        public static Error DateOfBirthRequired => Error.Validation(
+            "Employee.DateOfBirthRequired",
+            "Date Of Birth is required");
+
+        public static Error DateOfBirthInvalid => Error.Validation(
+            "Employee.DateOfBirthInvalid",
+            "Date Of Birth Invalid");
+    
     }
 }
