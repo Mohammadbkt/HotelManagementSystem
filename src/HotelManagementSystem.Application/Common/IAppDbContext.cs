@@ -14,7 +14,7 @@ namespace HotelManagementSystem.Application.Common
     public interface IAppDbContext 
     {
         public DbSet<Hotel> Hotels { get; }
-        public DbSet<Employee> Employees { get;  }
+        public DbSet<Employee> Employees { get; }
         public DbSet<Room> Rooms { get; }
         public DbSet<Reservation> Reservations { get; }
         public DbSet<RoomCategory> RoomCategories { get; }
