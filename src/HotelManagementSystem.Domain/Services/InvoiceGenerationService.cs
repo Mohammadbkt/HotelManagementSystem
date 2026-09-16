@@ -1,7 +1,7 @@
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Billing;
 using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
-using HotelManagementSystem.Domain.Entities.Stay;
+using HotelManagementSystem.Domain.Entities.Stays;
 
 namespace HotelManagementSystem.Domain.Services;
 
