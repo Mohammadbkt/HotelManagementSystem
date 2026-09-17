@@ -120,7 +120,7 @@ public sealed class Invoice : AuditableEntity
         return Result.Success();
     }
 
-    public Result Pay(Guid receivedByUserId, DateTimeOffset paidAt)
+    public Result Pay(DateTimeOffset paidAt)
     {
         if (Status == InvoiceStatus.Paid)
             return Result.Failure(InvoiceErrors.AlreadyPaid);
@@ -140,7 +140,6 @@ public sealed class Invoice : AuditableEntity
         var paymentResult = Payment.CreateCashPayment(
             Id,
             GuestId,
-            receivedByUserId,
             TotalAmount,
             paidAt);
 

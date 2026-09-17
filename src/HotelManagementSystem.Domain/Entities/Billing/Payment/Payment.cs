@@ -24,7 +24,6 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
             Guid id,
             Guid invoiceId,
             Guid guestId,
-            Guid receivedByUserId,
             Money amount,
             DateTimeOffset paymentDate,
             string? notes)
@@ -32,7 +31,6 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
         {
             InvoiceId = invoiceId;
             GuestId = guestId;
-            ReceivedByUserId = receivedByUserId;
             Amount = amount;
             Method = PaymentMethods.Cash;
             PaymentDate = paymentDate;
@@ -42,7 +40,6 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
         public static Result<Payment> CreateCashPayment(
             Guid invoiceId,
             Guid guestId,
-            Guid receivedByUserId,
             Money amount,
             DateTimeOffset paymentDate,
             string? notes = null)
@@ -63,7 +60,6 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
                 Guid.NewGuid(),
                 invoiceId,
                 guestId,
-                receivedByUserId,
                 amount,
                 paymentDate,
                 notes));
