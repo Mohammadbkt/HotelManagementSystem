@@ -1,6 +1,7 @@
 using HotelManagementSystem.Application.Common;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Billing;
+using HotelManagementSystem.Domain.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,17 +13,12 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.CreateInvo
 
         public async Task<Result<Guid>> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)
         {
-            var stay = await _context.Stays.SingleOrDefaultAsync(s => s.Id == request.StayId, cancellationToken);
+            var stay = await _context.Stays.FindAsync([request.StayId], cancellationToken);
             if (stay is null)
                 return Result<Guid>.Failure(Error.NotFound());
 
             if (stay.GuestId != request.GuestId)
                 return Result<Guid>.Failure(Error.Validation("Invoice.GuestMismatch", "Guest does not match the guest on the stay."));
-
-
-            var guest = await _context.Guests.SingleOrDefaultAsync(g => g.Id == request.GuestId, cancellationToken);
-            if (guest is null)
-                return Result<Guid>.Failure(Error.NotFound());
 
 
             var alreadyExists = await _context.Invoices
@@ -31,8 +27,17 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.CreateInvo
             if (alreadyExists)
                 return Result<Guid>.Failure(Error.Validation("Invoice.AlreadyExistsForStay", "An active invoice already exists for this stay."));
 
+            var room = await _context.Rooms.FindAsync([stay.RoomId], cancellationToken);
+            if(room is null)
+                return Result<Guid>.Failure(Error.NotFound());
 
-            var invoiceResult = Invoice.Create(stay.Id, guest.Id, request.CurrencyCode);
+
+            var roomCategory = await _context.RoomCategories.FindAsync([room.RoomCategoryId], cancellationToken);
+            if(roomCategory is null)
+                return Result<Guid>.Failure(Error.NotFound());
+
+
+            var invoiceResult = InvoiceGenerationService.BuildFromStay(stay, roomCategory);
             if (invoiceResult.IsError)
                 return Result<Guid>.Failure(invoiceResult.Errors);
 
