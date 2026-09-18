@@ -8,7 +8,7 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
     {
         public Guid InvoiceId { get; private set; }
         public Guid GuestId { get; private set; }
-        public Guid ReceivedByUserId { get; private set; }
+        //public Guid ReceivedByUserId { get; private set; }
 
         public Money Amount { get; private set; }
         public PaymentMethods Method { get; private set; }
