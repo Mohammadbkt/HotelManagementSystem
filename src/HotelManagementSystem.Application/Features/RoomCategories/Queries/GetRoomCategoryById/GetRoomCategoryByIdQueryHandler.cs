@@ -1,4 +1,4 @@
-using HotelManagementSystem.Application.Common;
+using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.RoomCategories.Dtos;
 using HotelManagementSystem.Application.Features.RoomCategories.Mappers;
 using HotelManagementSystem.Domain.Common.Result;

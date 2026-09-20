@@ -1,4 +1,4 @@
-using HotelManagementSystem.Application.Common;
+using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Guests.Commands.UpdateGuest;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;

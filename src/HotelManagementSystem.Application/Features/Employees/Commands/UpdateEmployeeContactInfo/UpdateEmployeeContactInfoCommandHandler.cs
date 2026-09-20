@@ -1,4 +1,4 @@
-using HotelManagementSystem.Application.Common;
+using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Employees.Commands.UpdateEmployeeContactInfo.HotelManagementSystem.Application.Features.Employees.Commands.UpdateEmployeeContactInfo;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.ValueObjects.Email;

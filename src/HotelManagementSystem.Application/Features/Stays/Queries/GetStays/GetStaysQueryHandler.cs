@@ -1,4 +1,4 @@
-using HotelManagementSystem.Application.Common;
+using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Common.Models;
 using HotelManagementSystem.Application.Features.Stays.Dtos;
 using HotelManagementSystem.Application.Features.Stays.Mappers;

@@ -1,9 +1,9 @@
-using HotelManagementSystem.Application.Common;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Reservations;
 using HotelManagementSystem.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
+using HotelManagementSystem.Application.Common.Interfaces;
 
 namespace HotelManagementSystem.Application.Features.Reservations.Commands.CreateReservations;
 

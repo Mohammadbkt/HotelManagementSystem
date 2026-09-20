@@ -3,7 +3,7 @@ using HotelManagementSystem.Domain.ValueObjects.Address;
 using HotelManagementSystem.Domain.ValueObjects.PhoneNumber;
 using HotelManagementSystem.Domain.Entities.Hotels;
 using MediatR;
-using HotelManagementSystem.Application.Common;
+using HotelManagementSystem.Application.Common.Interfaces;
 
 namespace HotelManagementSystem.Application.Features.Hotels.Commands.CreateHotel
 {

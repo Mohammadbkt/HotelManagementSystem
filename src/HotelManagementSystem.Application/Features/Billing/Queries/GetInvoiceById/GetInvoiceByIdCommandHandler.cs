@@ -1,4 +1,4 @@
-using HotelManagementSystem.Application.Common;
+using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Billing.Dtos;
 using HotelManagementSystem.Application.Features.Billing.Mappers;
 using HotelManagementSystem.Domain.Common.Result;

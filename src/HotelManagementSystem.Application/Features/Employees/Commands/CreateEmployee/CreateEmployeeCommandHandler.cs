@@ -1,4 +1,4 @@
-using HotelManagementSystem.Application.Common;
+using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Employee;
 using HotelManagementSystem.Domain.ValueObjects.Email;
