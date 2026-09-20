@@ -9,7 +9,7 @@ using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
 using HotelManagementSystem.Domain.Entities.Stays;
 using Microsoft.EntityFrameworkCore;
 
-namespace HotelManagementSystem.Application.Common
+namespace HotelManagementSystem.Application.Common.Interfaces
 {
     public interface IAppDbContext 
     {
