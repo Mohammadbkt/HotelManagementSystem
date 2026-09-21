@@ -2,19 +2,11 @@ using HotelManagementSystem.Domain.Common;
 
 namespace HotelManagementSystem.Domain.Entities.Stays
 {
-    public sealed class StayCheckedOutEvent: DomainEvent
+    public sealed class StayCheckedOutEvent(Guid stayId, Guid guestId, Guid roomId, DateTimeOffset checkOutDate) : DomainEvent
     {
-        public Guid StayId { get; }
-        public Guid GuestId { get; }
-        public Guid RoomId { get; }
-        public DateTimeOffset CheckOutDate { get; }
-
-        public StayCheckedOutEvent(Guid stayId, Guid guestId, Guid roomId, DateTimeOffset checkOutDate)
-        {
-            StayId = stayId;
-            GuestId = guestId;
-            RoomId = roomId;
-            CheckOutDate = checkOutDate;
-        }
+        public Guid StayId { get; } = stayId;
+        public Guid GuestId { get; } = guestId;
+        public Guid RoomId { get; } = roomId;
+        public DateTimeOffset CheckOutDate { get; } = checkOutDate;
     }
 }
