@@ -65,23 +65,46 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
 
         public Result Cancel()
         {
-            if (Status == ReservationStatus.Cancelled)
-                return Result.Failure(ReservationErrors.ReservationAlreadyCancelled);
-
-            if (Status == ReservationStatus.CheckedIn)
-                return Result.Failure(ReservationErrors.CannotCancelAfterCheckIn);
+            if (Status != ReservationStatus.Pending && Status != ReservationStatus.Confirmed)
+                return Result.Failure(ReservationErrors.CannotCancelReservation);
 
             Status = ReservationStatus.Cancelled;
 
             return Result.Success();
         }
 
-        public Result MarkAsCheckedIn()
+        public Result MarkAsCheckedIn(DateOnly today)
         {
             if (Status != ReservationStatus.Confirmed)
                 return Result.Failure(ReservationErrors.CannotCheckIn);
 
+            if (today < CheckInDate)
+                return Result.Failure(ReservationErrors.CannotCheckIn);
+                
+            if (today >= CheckOutDate)
+                return Result.Failure(ReservationErrors.CannotCheckIn);
+
+
             Status = ReservationStatus.CheckedIn;
+            return Result.Success();
+        }
+
+        public Result MarkAsComplete()
+        {
+            if (Status != ReservationStatus.CheckedIn)
+                return Result.Failure(ReservationErrors.CannotCompleteBeforeCheckIn);
+
+            Status = ReservationStatus.Completed;
+            return Result.Success();
+
+        }
+
+        public Result MarkAsNoShow()
+        {
+            if (Status != ReservationStatus.Confirmed)
+                return Result.Failure(ReservationErrors.CannotMarkNoShow);
+
+            Status = ReservationStatus.NoShow;
             return Result.Success();
         }
     }

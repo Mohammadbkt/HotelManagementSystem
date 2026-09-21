@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotelManagementSystem.Domain.Common.Result;
 
 namespace HotelManagementSystem.Domain.Entities.Reservations
@@ -20,11 +16,6 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
             Error.Validation(
                 "Reservation.InvalidCheckInOutDates",
                 "Invalid check-in and check-out dates.");
-
-        public static Error ReservationAlreadyCancelled =>
-            Error.Validation(
-                "Reservation.AlreadyCancelled",
-                "Reservation is already cancelled.");
 
         public static Error CannotUpdateReservation =>
             Error.Validation(
@@ -45,11 +36,21 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
             "Reservation.RoomAlreadyBooked",
             "The room is already booked for an overlapping date range.");
 
-        public static readonly Error CannotCancelAfterCheckIn = Error.Validation(
-            "Reservation.CannotCancelAfterCheckIn",
-            "Cannot cancel a reservation after Check in.");
+       public static readonly Error CannotCompleteBeforeCheckIn = Error.Validation(
+            "Reservation.CannotCompleteBeforeCheckIn",
+            "Cannot complete a reservation before Check in.");
+
+       
+        public static readonly Error CannotMarkNoShow = Error.Validation(
+            "Reservation.CannotMarkNoShow",
+            "Can not mark reservation as no show if the status is not confirmed."
+        );
 
 
+        
+        public static readonly Error CannotCancelReservation = Error.Validation(
+        "Reservation.CannotCancelReservation",
+        "Only pending or confirmed reservations can be cancelled.");
 
     }
 }

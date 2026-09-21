@@ -5,6 +5,8 @@ namespace HotelManagementSystem.Domain.Entities.Reservations
         Pending,
         Confirmed,
         CheckedIn,
-        Cancelled
+        Completed,
+        Cancelled,
+        NoShow
     }
 }

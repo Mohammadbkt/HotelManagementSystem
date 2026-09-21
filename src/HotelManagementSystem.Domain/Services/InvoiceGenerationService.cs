@@ -10,13 +10,10 @@ public static class InvoiceGenerationService
     public static Result<Invoice> BuildFromStay(Stay stay, RoomCategory category)
     {
         if (!stay.CheckOutDate.HasValue)
-             return Result<Invoice>.Failure(StayErrors.NotCheckedOutYet);
+            return Result<Invoice>.Failure(StayErrors.NotCheckedOutYet);
 
-        var nights = (int)Math.Ceiling(
-            (stay.CheckOutDate.Value - stay.CheckInDate).TotalDays);
-
-        if (nights < 1)
-            nights = 1;
+        var nights = Math.Max(1,
+       (stay.CheckOutDate.Value.UtcDateTime.Date - stay.CheckInDate.UtcDateTime.Date).Days);
 
         var invoiceResult = Invoice.Create(
             stay.Id,

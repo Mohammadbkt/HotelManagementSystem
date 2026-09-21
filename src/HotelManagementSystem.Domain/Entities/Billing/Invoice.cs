@@ -84,18 +84,19 @@ public sealed class Invoice : AuditableEntity
 
         var lineNumber = _lineItems.Count + 1;
 
-        var result = InvoiceLineItem.Create(
-            description,
-            quantity,
-            lineNumber,
-            unitPrice);
+        var result = InvoiceLineItem.Create(description, quantity, lineNumber, unitPrice);
 
         if (result.IsError)
             return Result.Failure(result.Errors);
 
         _lineItems.Add(result.Value);
 
-        RecalculateTotals();
+        var recalc = RecalculateTotals();
+        if (recalc.IsError)
+        {
+            _lineItems.Remove(result.Value);
+            return recalc;
+        }
 
         return Result.Success();
     }
@@ -169,39 +170,31 @@ public sealed class Invoice : AuditableEntity
     private Result RecalculateTotals()
     {
         var subtotal = Money.Zero(SubTotal.Currency);
-
-        foreach (var lineItem in _lineItems)
+        foreach (var item in _lineItems)
         {
-            var result = subtotal.Add(lineItem.LineTotal);
+            var sum = subtotal.Add(item.LineTotal);
 
-            if (result.IsError)
-            {
-                return Result.Failure(result.Errors);
-            }
+            if (sum.IsError)
+                return Result.Failure(sum.Errors);
 
-            subtotal = result.Value;
+            subtotal = sum.Value;
         }
 
-        SubTotal = subtotal;
-
-        var afterDiscount = SubTotal.Subtract(DiscountAmount);
+        var afterDiscount = subtotal.Subtract(DiscountAmount);
 
         if (afterDiscount.IsError)
-        {
             return Result.Failure(afterDiscount.Errors);
-        }
 
         var total = afterDiscount.Value.Add(TaxAmount);
 
         if (total.IsError)
-        {
             return Result.Failure(total.Errors);
-        }
 
+        SubTotal = subtotal;
         TotalAmount = total.Value;
+
         return Result.Success();
     }
-
     public Result ApplyDiscount(Money discount)
     {
         if (Status != InvoiceStatus.Draft)
@@ -217,8 +210,14 @@ public sealed class Invoice : AuditableEntity
         if (SubTotal.Subtract(discount).IsError)
             return Result.Failure(InvoiceErrors.DiscountExceedsSubtotal);
 
+        var previous = DiscountAmount;
         DiscountAmount = discount;
-        RecalculateTotals();
+        var recalc = RecalculateTotals();
+        if (recalc.IsError)
+        {
+            DiscountAmount = previous;
+            return recalc;
+        }
 
         return Result.Success();
     }
@@ -235,9 +234,15 @@ public sealed class Invoice : AuditableEntity
         if (tax.Currency != SubTotal.Currency)
             return Result.Failure(MoneyErrors.CurrencyMismatch);
 
+        var previous = TaxAmount;
         TaxAmount = tax;
 
-        RecalculateTotals();
+        var recalc = RecalculateTotals();
+        if (recalc.IsError)
+        {
+            TaxAmount = previous;
+            return recalc;
+        }
 
         return Result.Success();
     }
