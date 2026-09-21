@@ -18,9 +18,6 @@ namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoices
                         .AsNoTracking()
                         .AsQueryable();
 
-            // if(request.HotelId.HasValue)
-            //     query = query.Where(i => i.);
-
             if(request.GuestId.HasValue)
                 query = query.Where(i => i.GuestId == request.GuestId);
 
@@ -43,17 +40,17 @@ namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoices
                 query = query.Where(i => i.TotalAmount.Amount >= request.AmountFrom);
 
             if(request.AmountTo.HasValue)
-                query = query.Where(i => i.TotalAmount.Amount >= request.AmountTo);
+                query = query.Where(i => i.TotalAmount.Amount <= request.AmountTo);
 
             query = request.SortBy?.ToLowerInvariant() switch
             {
                 "amount" => request.SortDirection == SortDirection.Ascending 
-                            ? query = query.OrderBy(i => i.TotalAmount)
-                            : query = query.OrderByDescending(i => i.TotalAmount),
+                            ? query.OrderBy(i => i.TotalAmount.Amount)
+                            : query.OrderByDescending(i => i.TotalAmount.Amount),
                 
                 "paiddate" => request.SortDirection == SortDirection.Ascending 
-                            ? query = query.OrderBy(i => i.PaidAt)
-                            : query = query.OrderByDescending(i => i.PaidAt),
+                            ? query.OrderBy(i => i.PaidAt)
+                            : query.OrderByDescending(i => i.PaidAt),
 
                 _ => query = query.OrderBy(i => i.IssuedAt)
                 

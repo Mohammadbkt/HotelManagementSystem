@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoiceById
 {
-    public sealed class GetInvoiceByIdCommandHandler(IAppDbContext context) : IRequestHandler<GetInvoiceByIdCommand, Result<InvoiceDto>>
+    public sealed class GetInvoiceByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetInvoiceByIdQuery, Result<InvoiceDto>>
     {
         private readonly IAppDbContext _context = context;
 
-        public async Task<Result<InvoiceDto>> Handle(GetInvoiceByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Result<InvoiceDto>> Handle(GetInvoiceByIdQuery request, CancellationToken cancellationToken)
         {
             var invoiceDto = await _context.Invoices
                                 .AsNoTracking()

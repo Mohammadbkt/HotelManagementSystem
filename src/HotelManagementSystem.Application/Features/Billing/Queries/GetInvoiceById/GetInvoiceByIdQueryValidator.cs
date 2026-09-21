@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoiceById
 {
-    public sealed class GetInvoiceByIdCommandValidator : AbstractValidator<GetInvoiceByIdCommand>
+    public sealed class GetInvoiceByIdQueryValidator : AbstractValidator<GetInvoiceByIdQuery>
     {
-        public GetInvoiceByIdCommandValidator()
+        public GetInvoiceByIdQueryValidator()
         {
             RuleFor(x => x.InvoiceId)
                 .NotEmpty();

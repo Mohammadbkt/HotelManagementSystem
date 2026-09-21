@@ -4,7 +4,7 @@ using MediatR;
 
 namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoiceById
 {
-    public sealed record GetInvoiceByIdCommand(
+    public sealed record GetInvoiceByIdQuery(
         Guid InvoiceId
     ) : IRequest<Result<InvoiceDto>>;
 }
