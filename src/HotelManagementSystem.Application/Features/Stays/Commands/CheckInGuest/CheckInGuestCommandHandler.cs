@@ -1,7 +1,10 @@
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Guests;
+using HotelManagementSystem.Domain.Entities.Rooms;
 using HotelManagementSystem.Domain.Entities.Stays;
+using HotelManagementSystem.Domain.Services;
+using Microsoft.EntityFrameworkCore;
 using MediatR;
 
 namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
@@ -36,7 +39,9 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
             if (stayResult.IsError)
                 return Result<Guid>.Failure(stayResult.Errors);
 
-            var reservationResult = reservation.MarkAsCheckedIn();
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            var reservationResult = reservation.MarkAsCheckedIn(today);
             if (reservationResult.IsError)
                 return Result<Guid>.Failure(reservationResult.Errors);
 
@@ -63,6 +68,20 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
             var stayResult = Stay.Create(request.GuestId, request.RoomId, DateTimeOffset.UtcNow);
             if (stayResult.IsError)
                 return Result<Guid>.Failure(stayResult.Errors);
+
+            if (room.Status != RoomStatus.CleanVacant)
+                return Result<Guid>.Failure(RoomErrors.RoomNotAvailable);
+
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            var reservations = await _context.Reservations
+                .Where(r => r.RoomId == request.RoomId && r.CheckOutDate > today)
+                .ToListAsync(cancellationToken);
+
+            var availability = ReservationAvailabilityService.EnsureNoOverlap(
+                reservations, today, request.ExpectedCheckOutDate!.Value);
+            if (availability.IsError)
+                return Result<Guid>.Failure(availability.Errors);
 
             var roomResult = room.CheckIn();
             if (roomResult.IsError)

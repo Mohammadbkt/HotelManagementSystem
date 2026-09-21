@@ -18,6 +18,17 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckOutGues
             if (room is null)
                 return Result.Failure(Error.NotFound("Room.NotFound", "Room not found."));
 
+            if (stay.ReservationId.HasValue)
+            {
+                var reservation = await _context.Reservations.FindAsync([stay.ReservationId], cancellationToken);
+                if (reservation is null)
+                    return Result.Failure(Error.NotFound());
+
+                var completeResult = reservation.MarkAsComplete();
+                if (completeResult.IsError)
+                    return Result.Failure(completeResult.Errors);
+            }
+
             var stayResult = stay.CheckOut(DateTimeOffset.UtcNow);
             if (stayResult.IsError)
                 return Result.Failure(stayResult.Errors);
@@ -25,6 +36,8 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckOutGues
             var roomResult = room.CheckOut();
             if (roomResult.IsError)
                 return Result.Failure(roomResult.Errors);
+
+
 
             await _context.SaveChangesAsync(cancellationToken);
 

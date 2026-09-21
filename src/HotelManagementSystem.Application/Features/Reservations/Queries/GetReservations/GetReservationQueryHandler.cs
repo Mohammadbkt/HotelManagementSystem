@@ -48,7 +48,7 @@ namespace HotelManagementSystem.Application.Features.Reservations.Queries.GetRes
                     : query.OrderByDescending(r => r.CheckInDate)
             };
 
-            var totalCount = await query.CountAsync();
+            var totalCount = await query.CountAsync(cancellationToken);
 
             var items = await query
                         .Skip((request.PageNumber - 1) * request.PageSize)

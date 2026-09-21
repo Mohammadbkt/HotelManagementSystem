@@ -6,6 +6,7 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
     public sealed record CheckInGuestCommand(
         Guid GuestId,
         Guid RoomId,
-        Guid? ReservationId
+        Guid? ReservationId,
+        DateOnly? ExpectedCheckOutDate
     ) : IRequest<Result<Guid>>;
 }
