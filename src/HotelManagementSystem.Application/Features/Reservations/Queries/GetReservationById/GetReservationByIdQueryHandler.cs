@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Reservations.Dtos;
 using HotelManagementSystem.Application.Features.Reservations.Mappers;
@@ -20,7 +21,7 @@ namespace HotelManagementSystem.Application.Features.Reservations.Queries.GetRes
                                     .FirstOrDefaultAsync(cancellationToken);
 
             if(reservationDto is null)
-                return Result<ReservationDto>.Failure(Error.NotFound("Reservation.NotFound", "Reservation not found."));
+                return Result<ReservationDto>.Failure(ApplicationErrors.Reservation.NotFound);
 
             return Result<ReservationDto>.Success(reservationDto);
         }

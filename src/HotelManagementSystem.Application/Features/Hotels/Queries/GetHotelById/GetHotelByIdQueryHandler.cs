@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Hotels.Dtos;
 using HotelManagementSystem.Application.Features.Hotels.Mappers;
@@ -20,7 +21,7 @@ namespace HotelManagementSystem.Application.Features.Hotels.Queries.GetHotelById
 
             if (hotelDto is null)
                 return Result<HotelDto>.Failure(
-                    Error.NotFound("Hotel.NotFound", "Hotel not found."));
+                    ApplicationErrors.Hotel.NotFound);
 
             return Result<HotelDto>.Success(hotelDto);
         }

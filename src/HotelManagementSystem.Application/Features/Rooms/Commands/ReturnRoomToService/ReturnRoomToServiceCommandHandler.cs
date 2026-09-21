@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
@@ -12,7 +13,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ReturnRoomTo
         {
              var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
             if (room is null)
-                return Result.Failure(Error.NotFound("Room.NotFound", "Room not found"));
+                return Result.Failure(ApplicationErrors.Room.NotFound);
 
             var roomResult = room.ReturnToService();
             if (roomResult.IsError)

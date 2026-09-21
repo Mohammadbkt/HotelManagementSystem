@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Rooms;
@@ -16,7 +17,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.CreateRoom
                 .AnyAsync(h => h.Id == request.HotelId, cancellationToken);
 
             if (!hotelExists)
-                return Result<Guid>.Failure(Error.NotFound("Hotel.NotFound", "Hotel not found."));
+                return Result<Guid>.Failure(ApplicationErrors.Hotel.NotFound);
 
             var roomNumberExists = await _context.Rooms
             .AnyAsync(r => r.RoomNumber == request.RoomNumber &&
@@ -24,16 +25,16 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.CreateRoom
                            , cancellationToken);
             
             if (roomNumberExists)
-                return Result<Guid>.Failure(Error.Conflict("Room.RoomNumberAlreadyExists", "A room with this number already exists in this hotel."));
+                return Result<Guid>.Failure(ApplicationErrors.Room.AlreadyExists);
 
             var roomCategory = await _context.RoomCategories
                 .FindAsync([request.RoomCategoryId], cancellationToken);
            
             if (roomCategory is null)
-                return Result<Guid>.Failure(Error.NotFound("RoomCategory.NotFound", "Room category not found"));
+                return Result<Guid>.Failure(ApplicationErrors.RoomCategory.NotFound);
 
             if (roomCategory.HotelId != request.HotelId)
-                return Result<Guid>.Failure(Error.Validation("Room.CategoryHotelMismatch", "The selected room category does not belong to this hotel."));
+                return Result<Guid>.Failure(ApplicationErrors.RoomCategory.NotFound);
 
             var roomResult = Room.Create(request.HotelId, request.RoomNumber, roomCategory.Id);
             

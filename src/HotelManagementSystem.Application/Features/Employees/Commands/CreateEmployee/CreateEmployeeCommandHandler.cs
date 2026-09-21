@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Employee;
@@ -17,8 +18,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.CreateEm
                 .AnyAsync(h => h.Id == request.HotelId, ct);
 
             if (!hotelExists)
-                return Result<Guid>.Failure(
-                    Error.NotFound("Hotel.NotFound", $"Hotel {request.HotelId} was not found."));
+                return Result<Guid>.Failure(ApplicationErrors.Hotel.NotFound);
 
             var emailResult = EmailAddress.Create(request.Email);
             if (emailResult.IsError)

@@ -6,6 +6,7 @@ using HotelManagementSystem.Domain.Entities.Stays;
 using HotelManagementSystem.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
+using HotelManagementSystem.Application.Common.Errors;
 
 namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
 {
@@ -25,7 +26,7 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
         {
             var reservation = await _context.Reservations.FindAsync([request.ReservationId], cancellationToken);
             if (reservation is null)
-                return Result<Guid>.Failure(Error.NotFound("Reservation.NotFound", "Reservation not found."));
+                return Result<Guid>.Failure(ApplicationErrors.Reservation.NotFound);
 
             var guest = await _context.Guests.FindAsync([reservation.GuestId], cancellationToken);
             if (guest is null)
@@ -33,7 +34,7 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
 
             var room = await _context.Rooms.FindAsync([reservation.RoomId], cancellationToken);
             if (room is null)
-                return Result<Guid>.Failure(Error.NotFound("Room.NotFound", "Room not found."));
+                return Result<Guid>.Failure(ApplicationErrors.Room.NotFound);
 
             var stayResult = Stay.CreateFromReservation(reservation, DateTimeOffset.UtcNow);
             if (stayResult.IsError)
@@ -63,7 +64,7 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
 
             var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
             if (room is null)
-                return Result<Guid>.Failure(Error.NotFound("Room.NotFound", "Room not found."));
+                return Result<Guid>.Failure(ApplicationErrors.Room.NotFound);
 
             var stayResult = Stay.Create(request.GuestId, request.RoomId, DateTimeOffset.UtcNow);
             if (stayResult.IsError)

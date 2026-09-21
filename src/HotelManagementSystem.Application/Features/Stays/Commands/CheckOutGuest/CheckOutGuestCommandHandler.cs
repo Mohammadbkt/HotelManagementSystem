@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
@@ -12,17 +13,17 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckOutGues
         {
             var stay = await _context.Stays.FindAsync([request.StayId], cancellationToken);
             if (stay is null)
-                return Result.Failure(Error.NotFound("Stay.NotFound", "Stay not found."));
+                return Result.Failure(ApplicationErrors.Stay.NotFound);
 
             var room = await _context.Rooms.FindAsync([stay.RoomId], cancellationToken);
             if (room is null)
-                return Result.Failure(Error.NotFound("Room.NotFound", "Room not found."));
+                return Result.Failure(ApplicationErrors.Room.NotFound);
 
             if (stay.ReservationId.HasValue)
             {
                 var reservation = await _context.Reservations.FindAsync([stay.ReservationId], cancellationToken);
                 if (reservation is null)
-                    return Result.Failure(Error.NotFound());
+                    return Result.Failure(ApplicationErrors.Reservation.NotFound);
 
                 var completeResult = reservation.MarkAsComplete();
                 if (completeResult.IsError)

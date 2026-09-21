@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
@@ -12,7 +13,7 @@ namespace HotelManagementSystem.Application.Features.Reservations.Commands.Confi
         {
             var reservation = await _context.Reservations.FindAsync([request.ReservationId], cancellationToken);
             if (reservation is null)
-                return Result.Failure(Error.NotFound("Reservation.NotFound", "Reservation not found."));
+                return Result.Failure(ApplicationErrors.Reservation.NotFound);
 
             var result = reservation.Confirm();
 

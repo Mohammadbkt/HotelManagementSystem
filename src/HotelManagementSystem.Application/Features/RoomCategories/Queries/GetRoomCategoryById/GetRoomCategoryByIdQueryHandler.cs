@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.RoomCategories.Dtos;
 using HotelManagementSystem.Application.Features.RoomCategories.Mappers;
@@ -19,7 +20,7 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Queries.GetR
                                 .FirstOrDefaultAsync(cancellationToken);
 
             if(roomCategoryDto is null)
-                return Result<RoomCategoryDto>.Failure(Error.NotFound("RoomCategory.NotFound", "Room category not found"));
+                return Result<RoomCategoryDto>.Failure(ApplicationErrors.RoomCategory.NotFound);
 
             return Result<RoomCategoryDto>.Success(roomCategoryDto);
         }

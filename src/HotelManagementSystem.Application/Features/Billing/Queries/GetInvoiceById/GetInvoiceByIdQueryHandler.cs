@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Billing.Dtos;
 using HotelManagementSystem.Application.Features.Billing.Mappers;
@@ -22,7 +23,7 @@ namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoiceB
                                 .SingleOrDefaultAsync(cancellationToken);
 
             if(invoiceDto is null)
-                return Result<InvoiceDto>.Failure(Error.NotFound());
+                return Result<InvoiceDto>.Failure(ApplicationErrors.Invoice.NotFound);
 
             return Result<InvoiceDto>.Success(invoiceDto);
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
@@ -17,7 +18,7 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Commands.Upd
         {
             var roomCategory = await _context.RoomCategories.FindAsync([request.RoomCategoryId], cancellationToken);
             if(roomCategory is null)
-                return Result.Failure(Error.NotFound());
+                return Result.Failure(ApplicationErrors.RoomCategory.NotFound);
 
             var result = roomCategory.UpdateDetails(request.Name, request.Description, request.MaxCapacity);
             if(result.IsError)

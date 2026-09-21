@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Employees.Dtos;
 using HotelManagementSystem.Application.Features.Employees.Mappers;
@@ -20,7 +21,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Queries.GetEmploy
                                 .SingleOrDefaultAsync(cancellationToken);
 
             if(employeeDto is null)
-                return Result<EmployeeDto>.Failure(Error.NotFound("", ""));
+                return Result<EmployeeDto>.Failure(ApplicationErrors.Employee.NotFound);
 
             return Result<EmployeeDto>.Success(employeeDto);
         }

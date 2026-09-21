@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Services;
@@ -14,11 +15,11 @@ namespace HotelManagementSystem.Application.Features.Reservations.Commands.Updat
         {
             var reservation = await _context.Reservations.FindAsync([request.ReservationId], cancellationToken);
             if (reservation is null)
-                return Result.Failure(Error.NotFound("Reservation.NotFound", "Reservation not found."));
+                return Result.Failure(ApplicationErrors.Reservation.NotFound);
 
             var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
             if (room is null)
-                return Result.Failure(Error.NotFound("Room.NotFound", "Room not found."));
+                return Result.Failure(ApplicationErrors.Room.NotFound);
 
             var existingReservationsForRoom = await _context.Reservations
                 .Where(r => r.RoomId == request.RoomId && r.Id != request.ReservationId)

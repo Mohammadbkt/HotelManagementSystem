@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Stays.Dtos;
 using HotelManagementSystem.Application.Features.Stays.Mappers;
@@ -20,7 +21,7 @@ namespace HotelManagementSystem.Application.Features.Stays.Queries.GetStayById
                     .SingleOrDefaultAsync( cancellationToken);
 
             if(stayDto is null)
-                return Result<StayDto>.Failure(Error.NotFound("Stay.NotFound", "Stay not found."));
+                return Result<StayDto>.Failure(ApplicationErrors.Stay.NotFound);
 
             return Result<StayDto>.Success(stayDto);
 

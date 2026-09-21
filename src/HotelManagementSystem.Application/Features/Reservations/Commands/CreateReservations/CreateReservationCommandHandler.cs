@@ -4,6 +4,7 @@ using HotelManagementSystem.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
 using HotelManagementSystem.Application.Common.Interfaces;
+using HotelManagementSystem.Application.Common.Errors;
 
 namespace HotelManagementSystem.Application.Features.Reservations.Commands.CreateReservations;
 
@@ -16,11 +17,11 @@ public sealed class CreateReservationsCommandHandler(IAppDbContext context) : IR
         var guest = await _context.Guests.FindAsync([request.GuestId], cancellationToken);
 
         if (guest is null)
-            return Result<Guid>.Failure(Error.NotFound("Guest.NotFound", "Guest not found."));
+            return Result<Guid>.Failure(ApplicationErrors.Guest.NotFound);
 
         var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
         if (room is null)
-            return Result<Guid>.Failure(Error.NotFound("Room.NotFound", "Room not found."));
+            return Result<Guid>.Failure(ApplicationErrors.Room.NotFound);
 
 
         var existingReservationsForRoom = await _context.Reservations

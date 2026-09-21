@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.ValueObjects.Money;
@@ -16,7 +17,7 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Commands.Upd
         {
             var roomCategory = await _context.RoomCategories.FindAsync([request.RoomCategoryId], cancellationToken);
             if (roomCategory is null)
-                return Result.Failure(Error.NotFound("RoomCategory.NotFound", " Room category is not found"));
+                return Result.Failure(ApplicationErrors.RoomCategory.NotFound);
 
             var moneyResult = Money.Create(request.Price, request.Currency);
             if (moneyResult.IsError)

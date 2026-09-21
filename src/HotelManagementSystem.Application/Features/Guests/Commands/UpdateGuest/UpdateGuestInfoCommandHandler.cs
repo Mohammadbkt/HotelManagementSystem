@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Guests.Commands.UpdateGuest;
 using HotelManagementSystem.Domain.Common.Result;
@@ -17,7 +18,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.UpdateGuest
             var guest = await _context.Guests.FindAsync([request.GuestId], cancellationToken);
 
             if (guest is null)
-                return Result.Failure(Error.NotFound("Guest.NotFound", "Guest not found."));
+                return Result.Failure(ApplicationErrors.Guest.NotFound);
 
             var updateResult = guest.UpdateInfo(
                 request.FirstName,

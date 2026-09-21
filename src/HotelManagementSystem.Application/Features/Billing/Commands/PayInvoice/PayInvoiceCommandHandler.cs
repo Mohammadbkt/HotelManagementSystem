@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
@@ -12,7 +13,7 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.PayInvoice
         {
             var invoice = await _context.Invoices.FindAsync([request.InvoiceId], cancellationToken);
             if(invoice is null)
-                return Result.Failure(Error.NotFound());
+                return Result.Failure(ApplicationErrors.Invoice.NotFound);
 
             var invoiceResult = invoice.Pay(DateTimeOffset.UtcNow);
             if(invoiceResult.IsError)

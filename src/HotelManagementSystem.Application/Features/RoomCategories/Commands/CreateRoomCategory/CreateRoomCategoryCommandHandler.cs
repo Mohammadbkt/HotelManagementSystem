@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
@@ -14,13 +15,13 @@ namespace HotelManagementSystem.Application.Features.RoomCategories.Commands.Cre
         {
             var hotelExists = await _context.Hotels.AnyAsync(h => h.Id == request.HotelId, cancellationToken);
             if (hotelExists is false)
-                return Result<Guid>.Failure(Error.NotFound("Hotel.NotFound", "Hotel does not exist."));
+                return Result<Guid>.Failure(ApplicationErrors.Hotel.NotFound);
 
             var categoryExists = await _context.RoomCategories.AnyAsync(
                 rc => rc.HotelId == request.HotelId && rc.Name == request.Name,
                 cancellationToken);
             if (categoryExists)
-                return Result<Guid>.Failure(Error.Conflict("RoomCategory.DuplicateName", "A room category with this name already exists for this hotel."));
+                return Result<Guid>.Failure(ApplicationErrors.RoomCategory.AlreadyExists);
 
 
             var moneyResult = Money.Create(request.BasePrice, request.Currency);

@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Reservations;
@@ -14,11 +15,11 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomCa
         {
             var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
             if (room is null)
-                return Result.Failure(Error.NotFound("Room.NotFound", "Room not found."));
+                return Result.Failure(ApplicationErrors.Room.NotFound);
 
             var roomCategory = await _context.RoomCategories.FindAsync([request.RoomCategoryId], cancellationToken);
             if (roomCategory is null)
-                return Result.Failure(Error.NotFound("RoomCategory.NotFound", "Room category not found."));
+                return Result.Failure(ApplicationErrors.RoomCategory.NotFound);
 
             if (roomCategory.HotelId != room.HotelId)
                 return Result.Failure(Error.Validation("Room.CategoryHotelMismatch", "The selected room category does not belong to this hotel."));

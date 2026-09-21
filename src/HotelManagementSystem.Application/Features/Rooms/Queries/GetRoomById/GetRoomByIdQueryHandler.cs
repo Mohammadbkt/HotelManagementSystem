@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Rooms.Dtos;
 using HotelManagementSystem.Application.Features.Rooms.Mappers;
@@ -20,7 +21,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Queries.GetRoomById
                             .FirstOrDefaultAsync(cancellationToken);
 
             if (roomDto is null) 
-                return Result<RoomDto>.Failure(Error.NotFound("Room.NotFound", "Room not found."));
+                return Result<RoomDto>.Failure(ApplicationErrors.NotFound);
 
             return Result<RoomDto>.Success(roomDto);
 

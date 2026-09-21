@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Billing;
@@ -15,7 +16,7 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.CreateInvo
         {
             var stay = await _context.Stays.FindAsync([request.StayId], cancellationToken);
             if (stay is null)
-                return Result<Guid>.Failure(Error.NotFound());
+                return Result<Guid>.Failure(ApplicationErrors.Stay.NotFound);
 
             if (stay.GuestId != request.GuestId)
                 return Result<Guid>.Failure(Error.Validation("Invoice.GuestMismatch", "Guest does not match the guest on the stay."));
@@ -29,12 +30,12 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.CreateInvo
 
             var room = await _context.Rooms.FindAsync([stay.RoomId], cancellationToken);
             if(room is null)
-                return Result<Guid>.Failure(Error.NotFound());
+                return Result<Guid>.Failure(ApplicationErrors.Room.NotFound);
 
 
             var roomCategory = await _context.RoomCategories.FindAsync([room.RoomCategoryId], cancellationToken);
             if(roomCategory is null)
-                return Result<Guid>.Failure(Error.NotFound());
+                return Result<Guid>.Failure(ApplicationErrors.RoomCategory.NotFound);
 
 
             var invoiceResult = InvoiceGenerationService.BuildFromStay(stay, roomCategory);

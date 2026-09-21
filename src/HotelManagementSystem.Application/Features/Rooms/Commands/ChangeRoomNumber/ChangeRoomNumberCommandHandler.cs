@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomNumber;
 using HotelManagementSystem.Domain.Common.Result;
@@ -14,7 +15,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomNu
         {
             var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
             if (room is null)
-                return Result.Failure(Error.NotFound("Room.NotFound", "Room not found."));
+                return Result.Failure(ApplicationErrors.Room.NotFound);
 
             var duplicateExists  = await _context.Rooms
                 .AnyAsync(r =>  r.Id != room.Id 
@@ -22,12 +23,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomNu
                             && r.HotelId == room.HotelId, cancellationToken);
 
             if (duplicateExists )
-                return Result.Failure(
-                    Error.Conflict(
-                        "Room.RoomNumberAlreadyExists",
-                        "A room with this number already exists in this hotel."));
-
-            //TODO:A room number cannot be changed while the room has an active stay or reservation that would be affected.
+                return Result.Failure(ApplicationErrors.Room.AlreadyExists);
 
             var roomNumberResult = room.ChangeRoomNumber(request.RoomNumber);
             if (roomNumberResult.IsError)

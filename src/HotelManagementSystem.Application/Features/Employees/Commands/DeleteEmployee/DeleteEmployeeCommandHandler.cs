@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
@@ -17,9 +18,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.DeleteEm
 
             if (employee is null)
                 return Result.Failure(
-                    Error.NotFound(
-                        "Employee.NotFound",
-                        $"Employee {request.EmployeeId} was not found."));
+                    ApplicationErrors.Employee.NotFound);
 
             employee.Delete(Guid.Empty);
             

@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.ValueObjects.Money;
@@ -13,7 +14,7 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.AddInvoice
         {
             var invoice = await _context.Invoices.FindAsync([request.InvoiceId], cancellationToken);
             if (invoice is null)
-                return Result.Failure(Error.NotFound());
+                return Result.Failure(ApplicationErrors.Room.NotFound);
 
             var amountResult = Money.Create(request.UnitPriceAmount, request.UnitPriceCurrency);
             if (amountResult.IsError)

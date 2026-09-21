@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Application.Features.Employees.Commands.UpdateEmployeeContactInfo.HotelManagementSystem.Application.Features.Employees.Commands.UpdateEmployeeContactInfo;
 using HotelManagementSystem.Domain.Common.Result;
@@ -18,7 +19,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.UpdateEm
             var employee = await context.Employees.FindAsync([request.EmployeeId], cancellationToken);
 
             if (employee is null)
-                return Result.Failure(Error.NotFound("Employee.NotFound", "Employee was not found."));
+                return Result.Failure(ApplicationErrors.Employee.NotFound);
 
             var emailResult = EmailAddress.Create(request.Email);
             if (emailResult.IsError)
@@ -43,7 +44,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.UpdateEm
                 cancellationToken);
 
             if (duplicate)
-                return Result.Failure(Error.Conflict("Employee.Duplicate","An employee with this email or phone already exists."));
+                return Result.Failure(ApplicationErrors.Employee.AlreadyExists);
 
             var contactResult = employee.UpdateContactInfo(phone, email);
             if (contactResult.IsError)

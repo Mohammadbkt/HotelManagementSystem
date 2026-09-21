@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.ValueObjects.Address;
@@ -13,7 +14,7 @@ namespace HotelManagementSystem.Application.Features.Hotels.Commands.UpdateHotel
         {
             var hotel = await _context.Hotels.FindAsync([request.HotelId], cancellationToken);
             if (hotel is null)
-                return Result.Failure(Error.NotFound("Hotel.NotFound", "Hotel not found."));
+                return Result.Failure(ApplicationErrors.Hotel.NotFound);
 
             var addressResult = Address.Create(
             request.AddressLine1, request.City, request.Country,

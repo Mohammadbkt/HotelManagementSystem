@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.ValueObjects.Email;
@@ -20,7 +21,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.UpdateGuest
                 .FirstOrDefaultAsync(g => g.Id == request.GuestId, cancellationToken);
 
             if (guest is null)
-                return Result.Failure(Error.NotFound("Guest.NotFound", "Guest not found."));
+                return Result.Failure(ApplicationErrors.Guest.NotFound);
 
             EmailAddress? email = null;
             if (!string.IsNullOrWhiteSpace(request.Email))
