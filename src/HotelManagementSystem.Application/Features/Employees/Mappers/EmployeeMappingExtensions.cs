@@ -12,7 +12,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Mappers
             e.FirstName,
             e.LastName,
             e.PhoneNumber == null ? null : e.PhoneNumber.Value.Value,
-            e.EmailAddress == null ? null : e.EmailAddress.Value.Value,
+            e.EmailAddress.Value,
             e.DateOfBirth,
             e.Role
         );

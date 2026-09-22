@@ -5,15 +5,18 @@ using HotelManagementSystem.Application.Features.Employees.Mappers;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace HotelManagementSystem.Application.Features.Employees.Queries.GetEmployees
 {
-    public sealed class GetEmployeesQueryHandler(IAppDbContext context) : IRequestHandler<GetEmployeesQuery, Result<PaginatedList<EmployeeDto>>>
+    public sealed class GetEmployeesQueryHandler(IAppDbContext context, ILogger<GetEmployeesQueryHandler> logger) : IRequestHandler<GetEmployeesQuery, Result<PaginatedList<EmployeeDto>>>
     {
         private readonly IAppDbContext _context = context;
+        private readonly ILogger<GetEmployeesQueryHandler> _logger = logger;
 
         public async Task<Result<PaginatedList<EmployeeDto>>> Handle(GetEmployeesQuery request, CancellationToken cancellationToken)
         {
+
             var query = _context.Employees
                             .AsNoTracking()
                             .AsQueryable()

@@ -5,15 +5,18 @@ using HotelManagementSystem.Application.Features.Guests.Mappers;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace HotelManagementSystem.Application.Features.Guests.Queries.GetGuests
 {
-    public sealed class GetGuestsQueryHandler(IAppDbContext context) : IRequestHandler<GetGuestsQuery, Result<PaginatedList<GuestDto>>>
+    public sealed class GetGuestsQueryHandler(IAppDbContext context, ILogger<GetGuestsQueryHandler> logger) : IRequestHandler<GetGuestsQuery, Result<PaginatedList<GuestDto>>>
     {
         private readonly IAppDbContext _context = context;
+        private readonly ILogger<GetGuestsQueryHandler> _logger = logger;
 
         public async Task<Result<PaginatedList<GuestDto>>> Handle(GetGuestsQuery request, CancellationToken cancellationToken)
         {
+
             var query = _context.Guests
                         .AsNoTracking()
                         .AsQueryable();
@@ -63,6 +66,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Queries.GetGuests
                 Items = items
             };
 
+            _logger.LogInformation("Fetched {TotalCount} guests (page {PageNumber}/{TotalPages})", totalCount, request.PageNumber, paginatedResult.TotalPages);
             return Result<PaginatedList<GuestDto>>.Success(paginatedResult);
 
             

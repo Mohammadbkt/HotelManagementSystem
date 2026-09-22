@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace HotelManagementSystem.Application.Features.Billing.Commands.AddInvoiceLineItem
 {
-    public sealed class AddInvoiceLineItemCommandHandler(IAppDbContext context, ILogger<AddInvoiceLineItemCommandHandler> logger) : IRequestHandler<AddInvoiceLineItemCommand, Result>
+    public sealed class AddInvoiceLineItemCommandHandler(IAppDbContext context, ILogger<AddInvoiceLineItemCommandHandler> logger) 
+    : IRequestHandler<AddInvoiceLineItemCommand, Result>
     {
         private readonly IAppDbContext _context = context;
         private readonly ILogger<AddInvoiceLineItemCommandHandler> _logger = logger;

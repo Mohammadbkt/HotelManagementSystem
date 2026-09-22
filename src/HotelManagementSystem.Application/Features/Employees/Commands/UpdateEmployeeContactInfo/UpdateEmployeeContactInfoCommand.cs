@@ -3,11 +3,10 @@ using MediatR;
 
 namespace HotelManagementSystem.Application.Features.Employees.Commands.UpdateEmployeeContactInfo
 {
-    namespace HotelManagementSystem.Application.Features.Employees.Commands.UpdateEmployeeContactInfo
-    {
-        public sealed record UpdateEmployeeContactInfoCommand(
-            Guid EmployeeId,
-            string Email,
-            string? PhoneNumber) : IRequest<Result>;
-    }
+
+    public sealed record UpdateEmployeeContactInfoCommand(
+        Guid EmployeeId,
+        string Email,
+        string? PhoneNumber) : IRequest<Result>;
+
 }

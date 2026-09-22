@@ -3,26 +3,42 @@ using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace HotelManagementSystem.Application.Features.Employees.Commands.DeleteEmployee
 {
-    public sealed class DeleteEmployeeCommandHandler(IAppDbContext context)
+    public sealed class DeleteEmployeeCommandHandler(IAppDbContext context, ICurrentUserService currentUser, ILogger<DeleteEmployeeCommandHandler> logger)
         : IRequestHandler<DeleteEmployeeCommand, Result>
     {
+        private readonly IAppDbContext _context = context;
+        private readonly ICurrentUserService _currentUser = currentUser;
+        private readonly ILogger<DeleteEmployeeCommandHandler> _logger = logger;
+
+
         public async Task<Result> Handle(
             DeleteEmployeeCommand request,
-            CancellationToken ct)
+            CancellationToken cancellationToken)
         {
-            var employee = await context.Employees
-                .FirstOrDefaultAsync(e => e.Id == request.EmployeeId, ct);
+            var employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.Id == request.EmployeeId, cancellationToken);
 
             if (employee is null)
-                return Result.Failure(
-                    ApplicationErrors.Employee.NotFound);
+            {
+                _logger.LogWarning(
+                    "Employee {EmployeeId} not found; cannot delete",
+                    request.EmployeeId);
 
-            employee.Delete(Guid.Empty);
-            
-            await context.SaveChangesAsync(ct);
+                return Result.Failure(ApplicationErrors.Employee.NotFound);
+            }
+            employee.Delete(_currentUser.UserId ?? Guid.Empty);
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation(
+                "Employee {EmployeeId} deleted by user {ActorId}",
+                request.EmployeeId,
+                _currentUser.UserId);
+                
             return Result.Success();
         }
     }

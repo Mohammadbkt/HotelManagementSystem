@@ -5,12 +5,14 @@ using HotelManagementSystem.Application.Features.Rooms.Mappers;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace HotelManagementSystem.Application.Features.Rooms.Queries.GetRooms
 {
-    public sealed class GetRoomsQueryHandler(IAppDbContext context) : IRequestHandler<GetRoomsQuery, Result<PaginatedList<RoomDto>>>
+    public sealed class GetRoomsQueryHandler(IAppDbContext context, ILogger<GetRoomsQueryHandler> logger) : IRequestHandler<GetRoomsQuery, Result<PaginatedList<RoomDto>>>
     {
         private readonly IAppDbContext _context = context;
+        private readonly ILogger<GetRoomsQueryHandler> _logger = logger;
 
         public async Task<Result<PaginatedList<RoomDto>>> Handle(GetRoomsQuery request, CancellationToken cancellationToken)
         {
@@ -53,6 +55,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Queries.GetRooms
                 Items = items
             };
 
+             _logger.LogInformation("Retrieved {TotalCount} rooms for hotel {HotelId} (page {PageNumber}/{TotalPages})", totalCount, request.HotelId, request.PageNumber, paginatedResult.TotalPages);
              return Result<PaginatedList<RoomDto>>.Success(paginatedResult);
 
         }

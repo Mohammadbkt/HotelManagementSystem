@@ -5,15 +5,18 @@ using HotelManagementSystem.Application.Features.Billing.Mappers;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoices
 {
-    public sealed class GetInvoicesQueryHandler(IAppDbContext context) : IRequestHandler<GetInvoicesQuery, Result<PaginatedList<InvoiceDto>>>
+    public sealed class GetInvoicesQueryHandler(IAppDbContext context, ILogger<GetInvoicesQueryHandler> logger) : IRequestHandler<GetInvoicesQuery, Result<PaginatedList<InvoiceDto>>>
     {
         private readonly IAppDbContext _context = context;
+        private readonly ILogger<GetInvoicesQueryHandler> _logger = logger;
 
         public async Task<Result<PaginatedList<InvoiceDto>>> Handle(GetInvoicesQuery request, CancellationToken cancellationToken)
         {
+
             var query = _context.Invoices
                         .AsNoTracking()
                         .AsQueryable();
@@ -73,6 +76,7 @@ namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoices
                 Items = items
             };
 
+            _logger.LogInformation("Fetched {TotalCount} invoices (page {PageNumber}/{TotalPages})", totalCount, request.PageNumber, paginatedList.TotalPages);
             return Result<PaginatedList<InvoiceDto>>.Success(paginatedList);
         }
     }

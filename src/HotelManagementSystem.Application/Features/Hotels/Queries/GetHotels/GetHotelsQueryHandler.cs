@@ -5,12 +5,14 @@ using HotelManagementSystem.Application.Features.Hotels.Mappers;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace HotelManagementSystem.Application.Features.Hotels.Queries.GetHotels
 {
-    public sealed class GetHotelsQueryHandler(IAppDbContext context) : IRequestHandler<GetHotelsQuery, Result<PaginatedList<HotelDto>>>
+    public sealed class GetHotelsQueryHandler(IAppDbContext context, ILogger<GetHotelsQueryHandler> logger) : IRequestHandler<GetHotelsQuery, Result<PaginatedList<HotelDto>>>
     {
         private readonly IAppDbContext _context = context;
+        private readonly ILogger<GetHotelsQueryHandler> _logger = logger;
 
         public async Task<Result<PaginatedList<HotelDto>>> Handle(GetHotelsQuery request, CancellationToken cancellationToken)
         {
@@ -53,6 +55,7 @@ namespace HotelManagementSystem.Application.Features.Hotels.Queries.GetHotels
                 Items = items
             };
 
+            _logger.LogInformation("Retrieved {TotalCount} hotels (page {PageNumber}/{TotalPages})", totalCount, request.PageNumber, paginatedResult.TotalPages);
             return Result<PaginatedList<HotelDto>>.Success(paginatedResult);
         }
     }

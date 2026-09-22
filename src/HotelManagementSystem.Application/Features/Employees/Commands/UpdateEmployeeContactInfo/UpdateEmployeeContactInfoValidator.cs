@@ -1,5 +1,4 @@
 using FluentValidation;
-using HotelManagementSystem.Application.Features.Employees.Commands.UpdateEmployeeContactInfo.HotelManagementSystem.Application.Features.Employees.Commands.UpdateEmployeeContactInfo;
 using HotelManagementSystem.Domain.ValueObjects.Email;
 using HotelManagementSystem.Domain.ValueObjects.PhoneNumber;
 
