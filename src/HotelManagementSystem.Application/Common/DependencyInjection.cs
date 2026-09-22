@@ -14,6 +14,8 @@ namespace HotelManagementSystem.Application.Common
             services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+                cfg.AddOpenBehavior(typeof(UnhandledExceptionBehavior<,>));
                 cfg.AddOpenBehavior(typeof(ValidationBehaviors<,>));
             });
 

@@ -35,7 +35,13 @@ public static class ApplicationErrors
             Error.Conflict(
                 "RoomCategory.HasRooms",
                 "The room category cannot be deleted because it has rooms.");
+
+        public static readonly Error HotelMismatch =
+            Error.Validation(
+                "RoomCategory.HotelMismatch",
+                "The selected room category does not belong to this hotel.");
     }
+
 
     public static class Room
     {
@@ -68,6 +74,16 @@ public static class ApplicationErrors
             Error.Conflict(
                 "Room.CannotDelete",
                 "The room cannot be deleted in its current state.");
+
+        public static readonly Error HasActiveReservation =
+            Error.Validation(
+                "Room.HasActiveReservation",
+                "Cannot change category: the room has an active reservation.");
+
+        public static readonly Error HasActiveStay =
+            Error.Validation(
+                "Room.HasActiveStay",
+                "Cannot change category: the room has an active stay.");
     }
 
     public static class Guest

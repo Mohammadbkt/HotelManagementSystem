@@ -1,3 +1,4 @@
+using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Guests;
@@ -19,7 +20,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.CreateGuest
             {
                 var emailResult = EmailAddress.Create(request.Email);
                 if (emailResult.IsError)
-                    return Result<Guid>.Failure(Error.Validation());
+                    return Result<Guid>.Failure(emailResult.Errors);
 
                 email = emailResult.Value;
             }
@@ -29,7 +30,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.CreateGuest
             {
                 var phoneResult = PhoneNumber.Create(request.Phone);
                 if (phoneResult.IsError)
-                    return Result<Guid>.Failure(Error.Validation());
+                    return Result<Guid>.Failure(phoneResult.Errors);
 
                 phone = phoneResult.Value;
             }
@@ -42,7 +43,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.CreateGuest
                     cancellationToken);
 
                 if (duplicateExists)
-                    return Result<Guid>.Failure(Error.Conflict("Guest.Duplicate", "A guest with this email or phone already exists."));
+                    return Result<Guid>.Failure(ApplicationErrors.Guest.AlreadyExists);
             }
 
             var guest = Guest.Create(

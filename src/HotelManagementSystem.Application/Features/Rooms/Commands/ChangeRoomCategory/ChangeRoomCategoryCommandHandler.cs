@@ -22,7 +22,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomCa
                 return Result.Failure(ApplicationErrors.RoomCategory.NotFound);
 
             if (roomCategory.HotelId != room.HotelId)
-                return Result.Failure(Error.Validation("Room.CategoryHotelMismatch", "The selected room category does not belong to this hotel."));
+                return Result.Failure(ApplicationErrors.RoomCategory.HotelMismatch);
 
             var hasActiveReservation = await _context.Reservations
                                         .AnyAsync(r => r.RoomId == request.RoomId
@@ -33,8 +33,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomCa
                                                 ), cancellationToken);
 
             if (hasActiveReservation)
-                return Result.Failure(Error.Validation("Room.HasActiveReservation",
-                    "Cannot change category: the room has an active reservation."));
+                return Result.Failure(ApplicationErrors.Room.HasActiveReservation);
 
             var hasActiveStay = await _context.Stays.AnyAsync(
                 s => s.RoomId == request.RoomId 
@@ -43,8 +42,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Commands.ChangeRoomCa
             );
 
             if (hasActiveStay)
-                return Result.Failure(Error.Validation("Room.HasActiveStay",
-                    "Cannot change category: the room has an active stay."));
+                return Result.Failure(ApplicationErrors.Room.HasActiveStay);
 
             var categoryResult = room.ChangeCategory(request.RoomCategoryId);
             if (categoryResult.IsError)
