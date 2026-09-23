@@ -33,7 +33,7 @@ public sealed class StayCheckedOutEventHandler(IAppDbContext context, ILogger<St
 
         if (stay is null || room is null || category is null)
         {
-            logger.LogWarning("Draft invoice not created for stay {StayId}: missing stay, room or category.",
+            _logger.LogWarning("Draft invoice not created for stay {StayId}: missing stay, room or category.",
                 notification.StayId);
             return;
         }
@@ -41,7 +41,7 @@ public sealed class StayCheckedOutEventHandler(IAppDbContext context, ILogger<St
         var invoiceResult = InvoiceGenerationService.BuildFromStay(stay, category);
         if (invoiceResult.IsError)
         {
-            logger.LogWarning("Draft invoice not created for stay {StayId}: {Errors}",
+            _logger.LogWarning("Draft invoice not created for stay {StayId}: {Errors}",
                notification.StayId, invoiceResult.Errors);
             return;
         }
