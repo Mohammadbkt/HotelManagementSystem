@@ -54,7 +54,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.CreateGuest
                 if (duplicateExists)
                 {
                     _logger.LogWarning("Guest already exists (email {Email}, phone {Phone})", request.Email, request.Phone);
-                    return Result<Guid>.Failure(ApplicationErrors.Guest.AlreadyExists);
+                    return Result<Guid>.Failure(ApplicationErrors.GuestErrors.AlreadyExists);
                 }
             }
 

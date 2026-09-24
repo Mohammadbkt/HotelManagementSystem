@@ -28,6 +28,10 @@ public static class GuestErrors
         "Guest.AtLeastOneContactRequired",
         "At least one contact method (email or phone) is required.");
 
+    public static Error AlreadyLinkedToAccount => Error.Validation(
+        "Guest.AlreadyLinkedToAccount",
+        "Guest already linked to account.");
+
     public static Error NotFound => 
     Error.NotFound(
         "Guest.NotFound",

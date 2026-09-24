@@ -12,6 +12,7 @@ namespace HotelManagementSystem.Domain.Entities.Employee
         public string LastName { get; private set; } = default!;
         public PhoneNumber? PhoneNumber { get; private set; }
         public EmailAddress EmailAddress { get; private set; }
+        public Guid? UserId { get; private set; }
         public DateOnly DateOfBirth { get; private set; }
         public EmployeeRole Role { get; private set; }
         public string FullName => $"{FirstName} {LastName}";
@@ -90,6 +91,15 @@ namespace HotelManagementSystem.Domain.Entities.Employee
         {
             PhoneNumber = phoneNumber;
             EmailAddress = emailAddress;
+            return Result.Success();
+        }
+
+        public Result LinkToUserAccount(Guid userId)
+        {
+            if (UserId is not null)
+                return Result.Failure(EmployeeErrors.AlreadyLinkedToAccount);
+
+            UserId = userId;
             return Result.Success();
         }
     }

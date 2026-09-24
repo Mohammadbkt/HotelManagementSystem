@@ -86,7 +86,7 @@ public static class ApplicationErrors
                 "Cannot change category: the room has an active stay.");
     }
 
-    public static class Guest
+    public static class GuestErrors
     {
         public static readonly Error NotFound =
             Error.NotFound(

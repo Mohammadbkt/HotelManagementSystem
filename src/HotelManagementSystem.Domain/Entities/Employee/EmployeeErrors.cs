@@ -31,6 +31,10 @@ namespace HotelManagementSystem.Domain.Entities.Employee
         public static Error DateOfBirthInvalid => Error.Validation(
             "Employee.DateOfBirthInvalid",
             "Date Of Birth Invalid");
-    
+
+        public static Error AlreadyLinkedToAccount => Error.Conflict(
+            "Employee.AlreadyLinkedToAccount",
+            "This employee already has a login account.");
+
     }
 }

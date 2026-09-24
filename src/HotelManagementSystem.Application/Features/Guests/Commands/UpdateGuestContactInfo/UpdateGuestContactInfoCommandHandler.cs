@@ -26,7 +26,7 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.UpdateGuest
             if (guest is null)
             {
                 _logger.LogWarning("Guest {GuestId} not found", request.GuestId);
-                return Result.Failure(ApplicationErrors.Guest.NotFound);
+                return Result.Failure(ApplicationErrors.GuestErrors.NotFound);
             }
 
             EmailAddress? email = null;

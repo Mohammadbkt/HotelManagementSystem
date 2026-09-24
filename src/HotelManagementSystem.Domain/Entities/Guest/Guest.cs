@@ -11,6 +11,7 @@ public sealed class Guest : SoftDeletableEntity
     public string LastName { get; private set; } = default!;
     public EmailAddress? Email { get; private set; }
     public PhoneNumber? PhoneNumber { get; private set; }
+    public Guid? UserId { get; private set; }
     public DateOnly DateOfBirth { get; private set; }
 
     private Guest() { }
@@ -95,6 +96,15 @@ public sealed class Guest : SoftDeletableEntity
         Email = email;
         PhoneNumber = phoneNumber;
 
+        return Result.Success();
+    }
+
+    public Result LinkToUserAccount(Guid userId)
+    {
+        if (UserId is not null)
+            return Result.Failure(GuestErrors.AlreadyLinkedToAccount);
+
+        UserId = userId;
         return Result.Success();
     }
 }
