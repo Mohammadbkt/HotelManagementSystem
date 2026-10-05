@@ -34,5 +34,8 @@ public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand
         RuleFor(x => x.PhoneNumber)
             .Matches(@"^\+?[\d\s-]{10,}$").When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber))
             .WithMessage("Invalid phone number format");
+
+        RuleFor(x => x.DateOfBirth)
+            .NotEmpty();
     }
 }

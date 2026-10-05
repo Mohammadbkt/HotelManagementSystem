@@ -4,8 +4,8 @@ using HotelManagementSystem.Domain.Common.Result;
 
 namespace HotelManagementSystem.Application.Common.Interfaces
 {
-    public interface IJwtService
+    public interface IAccessTokenGenerator
     {
-        Task<Result<AccessTokenValue>> GenerateAccessToken(AppUserDto user, CancellationToken ct);
+        Result<AccessToken> Generate(AppUserDto user);
     }
 }

@@ -7,6 +7,7 @@ using HotelManagementSystem.Domain.ValueObjects.Email;
 using HotelManagementSystem.Domain.ValueObjects.PhoneNumber;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementSystem.Application.Features.Identity.Commands.Register
 {
@@ -14,14 +15,14 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.Register
             IAppDbContext context,
             IIdentityService identity,
             IRefreshTokenService refreshTokenService,
-            IJwtService jwtService,
+            IAccessTokenGenerator jwtService,
             ILogger<RegisterCommandHandler> logger
             ) : IRequestHandler<RegisterCommand, Result<AuthResponseDto>>
     {
         private readonly IAppDbContext _context = context;
         private readonly IIdentityService _identity = identity;
         private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
-        private readonly IJwtService _jwtService = jwtService;
+        private readonly IAccessTokenGenerator _jwtService = jwtService;
         private readonly ILogger<RegisterCommandHandler> _logger = logger;
 
 
@@ -31,7 +32,7 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.Register
             if (emailResult.IsError)
                 return Result<AuthResponseDto>.Failure(emailResult.Errors);
 
-            var createUserResult = await _identity.CreateUserAsync(request.Email, request.Username, request.Password, role: "Guest", cancellationToken);
+            var createUserResult = await _identity.CreateUserAsync(request.Email, request.Username, request.Password,request.FirstName,request.LastName,request.PhoneNumber,null,  cancellationToken);
             if (createUserResult.IsError)
             {
                 _logger.LogWarning("Registration failed for {Email}: {Error}", request.Email, createUserResult.TopError.Description);
@@ -41,8 +42,7 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.Register
             var user = createUserResult.Value;
 
             var existingGuest = await _context.Guests
-                .FindAsync([emailResult.Value.Value], cancellationToken);
-
+                            .FirstOrDefaultAsync(g => g.Email!.Value.Value == request.Email, cancellationToken);
             if (existingGuest is not null)
             {
                 var linkResult = existingGuest.LinkToUserAccount(user.Id);
@@ -51,7 +51,7 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.Register
             }
             else if (request.PhoneNumber is not null)
             {
-                var phoneNumberResult = PhoneNumber.Create(request.PhoneNumber); 
+                var phoneNumberResult = PhoneNumber.Create(request.PhoneNumber);
 
                 var guestResult = Guest.Create(
                     request.FirstName, request.LastName, emailResult.Value, phoneNumberResult.Value, request.DateOfBirth);
@@ -64,17 +64,17 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.Register
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var accessTokenResult = await _jwtService.GenerateAccessToken(user, cancellationToken);
+            var accessTokenResult = _jwtService.Generate(user);
             if (accessTokenResult.IsError)
                 return Result<AuthResponseDto>.Failure(accessTokenResult.Errors);
 
-            var refreshTokenValueResult = await _refreshTokenService.CreateAsync(user.Id, cancellationToken);
+            var refreshTokenValueResult = await _refreshTokenService.CreateAsync(user.Id,request.DeviceName, request.IpAddress, cancellationToken);
             if (refreshTokenValueResult.IsError)
                 return Result<AuthResponseDto>.Failure(refreshTokenValueResult.Errors);
 
             var refreshTokenResult = RefreshToken.Create(
-                refreshTokenValueResult.Value.Value, user.Id, refreshTokenValueResult.Value.ExpiresAt,
-                deviceName: null, ipAddress: null);
+                refreshTokenValueResult.Value.Token, user.Id, DateTimeOffset.UtcNow.AddMinutes(15),
+                request.DeviceName, request.IpAddress);
             if (refreshTokenResult.IsError)
                 return Result<AuthResponseDto>.Failure(refreshTokenResult.Errors);
 
@@ -85,8 +85,9 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.Register
 
             return Result<AuthResponseDto>.Success(new AuthResponseDto(
                 accessTokenResult.Value.Value,
-                refreshTokenValueResult.Value.Value,
-                accessTokenResult.Value.ExpiresAt));
+                refreshTokenValueResult.Value.Token,
+                accessTokenResult.Value.ExpiresAtUtc,
+                refreshTokenValueResult.Value.ExpiresOnUtc));
 
         }
     }

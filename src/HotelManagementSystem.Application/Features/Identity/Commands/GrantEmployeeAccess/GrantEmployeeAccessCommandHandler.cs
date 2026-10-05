@@ -32,7 +32,10 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.GrantEmpl
                  employee.EmailAddress.Value, 
                  request.Username,
                  request.TemporaryPassword, 
-                 request.EmployeeRole, 
+                 null,
+                 null,
+                 null,
+                 null,
                  cancellationToken);
 
             if (createUserResult.IsError)

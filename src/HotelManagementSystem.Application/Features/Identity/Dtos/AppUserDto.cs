@@ -11,7 +11,8 @@ namespace HotelManagementSystem.Application.Features.Identity.Dtos
         string LastName,
         string Email, 
         string Username,
-        string PhoneNumber,
+        Guid? HotelId,
+        string? PhoneNumber,
         IReadOnlyCollection<string> Roles,
         IReadOnlyCollection<string> Claims
     );

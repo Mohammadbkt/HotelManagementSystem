@@ -11,6 +11,8 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.Register
         string FirstName,
         string LastName,
         DateOnly DateOfBirth,
+        string? DeviceName,
+        string? IpAddress,
         string? PhoneNumber = null
     ) : IRequest<Result<AuthResponseDto>>;
 }

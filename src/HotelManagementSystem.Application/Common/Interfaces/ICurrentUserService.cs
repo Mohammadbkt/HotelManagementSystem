@@ -4,6 +4,8 @@ namespace HotelManagementSystem.Application.Common.Interfaces
     {
         Guid? UserId { get; }
         string? UserName { get; }
+        Guid? HotelId { get; }
+        IReadOnlyCollection<string> Roles { get; }
         bool IsAuthenticated { get; }
     }
 }

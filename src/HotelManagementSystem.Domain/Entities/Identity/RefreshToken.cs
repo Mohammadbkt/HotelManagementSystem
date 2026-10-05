@@ -6,11 +6,11 @@ namespace HotelManagementSystem.Domain.Entities.Identity;
 
 public sealed class RefreshToken : AuditableEntity
 {
-    public string Token { get; } = null!;
-    public Guid UserId { get; }
-    public DateTimeOffset ExpiresOnUtc { get; }
-    public string? DeviceName { get; }
-    public string? IpAddress { get; }
+    public string Token { get; private set; } = null!;
+    public Guid UserId { get; private set; }
+    public DateTimeOffset ExpiresOnUtc { get; private set; }
+    public string? DeviceName { get; private set; }
+    public string? IpAddress { get; private set; }
     public DateTimeOffset? RevokedAt { get; private set; }
     public string? ReplacedByToken { get; private set; }
 

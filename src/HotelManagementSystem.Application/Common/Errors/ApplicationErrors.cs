@@ -4,8 +4,6 @@ namespace HotelManagementSystem.Application.Common.Errors;
 
 public static class ApplicationErrors
 {
-    public static Error NotFound { get; internal set; }
-
     public static class Hotel
     {
         public static readonly Error NotFound =
