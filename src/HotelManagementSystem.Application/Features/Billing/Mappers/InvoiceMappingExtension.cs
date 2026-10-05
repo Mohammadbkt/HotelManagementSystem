@@ -11,7 +11,6 @@ namespace HotelManagementSystem.Application.Features.Billing.Mappers
                 i.Id,
                 i.StayId,
                 i.GuestId,
-                i.GuestId == Guid.Empty ? string.Empty : null!,
                 i.IssuedAt,
                 i.PaidAt,
                 i.Status,

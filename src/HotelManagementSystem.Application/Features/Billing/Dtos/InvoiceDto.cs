@@ -6,7 +6,7 @@ namespace HotelManagementSystem.Application.Features.Billing.Dtos
         Guid Id,
         Guid StayId,
         Guid GuestId,
-        string GuestName,
+        // string GuestName,
         DateTimeOffset? IssuedAt,
         DateTimeOffset? PaidAt,
         InvoiceStatus Status,

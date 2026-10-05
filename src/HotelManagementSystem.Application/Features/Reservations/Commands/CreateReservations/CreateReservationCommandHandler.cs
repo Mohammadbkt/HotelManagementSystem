@@ -21,7 +21,7 @@ public sealed class CreateReservationsCommandHandler(IAppDbContext context, ILog
         if (guest is null)
         {
             _logger.LogWarning("Guest {GuestId} not found for reservation creation", request.GuestId);
-            return Result<Guid>.Failure(ApplicationErrors.Guest.NotFound);
+            return Result<Guid>.Failure(ApplicationErrors.GuestErrors.NotFound);
         }
 
         var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);

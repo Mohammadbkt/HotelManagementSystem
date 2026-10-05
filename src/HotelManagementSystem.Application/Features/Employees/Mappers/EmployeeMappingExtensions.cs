@@ -11,8 +11,8 @@ namespace HotelManagementSystem.Application.Features.Employees.Mappers
             e.Id,
             e.FirstName,
             e.LastName,
-            e.PhoneNumber == null ? null : e.PhoneNumber.Value.Value,
             e.EmailAddress.Value,
+            e.PhoneNumber == null ? null : e.PhoneNumber.Value.Value,
             e.DateOfBirth,
             e.Role
         );

@@ -25,7 +25,7 @@ namespace HotelManagementSystem.Application.Features.Rooms.Queries.GetRoomById
             if (roomDto is null) 
             {
                 _logger.LogWarning("Room {RoomId} not found", request.RoomId);
-                return Result<RoomDto>.Failure(ApplicationErrors.NotFound);
+                return Result<RoomDto>.Failure(ApplicationErrors.Room.NotFound);
             }
 
             _logger.LogInformation("Room {RoomId} retrieved", request.RoomId);

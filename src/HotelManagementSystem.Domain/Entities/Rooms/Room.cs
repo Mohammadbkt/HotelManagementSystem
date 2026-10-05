@@ -1,6 +1,5 @@
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
-using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
 
 namespace HotelManagementSystem.Domain.Entities.Rooms
 {
