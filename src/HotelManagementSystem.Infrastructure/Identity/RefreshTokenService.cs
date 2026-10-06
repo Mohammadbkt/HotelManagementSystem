@@ -8,10 +8,10 @@ using Microsoft.Extensions.Options;
 
 namespace HotelManagementSystem.Infrastructure.Identity
 {
-    public sealed class RefreshTokenService(IOptions<JwtOptions> options, AppDbContext context) : IRefreshTokenService
+    public sealed class RefreshTokenService(IOptions<JwtOptions> options, IAppDbContext context) : IRefreshTokenService
     {
         private readonly IOptions<JwtOptions> _options = options;
-        private readonly AppDbContext _context = context;
+        private readonly IAppDbContext _context = context;
 
         public async Task<Result<RefreshToken>> CreateAsync(Guid userId, string? deviceName, string? ipAddress, CancellationToken cancellationToken)
         {

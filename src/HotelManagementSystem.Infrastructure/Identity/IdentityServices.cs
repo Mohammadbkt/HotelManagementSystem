@@ -12,12 +12,12 @@ namespace HotelManagementSystem.Infrastructure.Identity;
 public sealed class IdentityServices(
     UserManager<AppUser> userManager,
     RoleManager<IdentityRole<Guid>> roleManager,
-    AppDbContext context,
+    IAppDbContext context,
     ILogger<IdentityServices> logger) : IIdentityService
 {
     private readonly UserManager<AppUser> _userManager = userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager = roleManager;
-    private readonly AppDbContext _context = context;
+    private readonly IAppDbContext _context = context;
     private readonly ILogger<IdentityServices> _logger = logger;
 
     public async Task<Result<AppUserDto>> AuthenticateAsync(string identifier, string password, CancellationToken cancellationToken)
@@ -71,15 +71,7 @@ public sealed class IdentityServices(
         return Result<AppUserDto>.Success(userDto);
     }
 
-    public async Task<Result<AppUserDto>> CreateUserAsync(
-        string email,
-        string username,
-        string password,
-        string firstName,
-        string lastName,
-        string? phoneNumber,
-        string role,
-        CancellationToken cancellationToken)
+    public async Task<Result<AppUserDto>> CreateUserAsync(string email, string username, string password, string firstName, string lastName, string? phoneNumber, string role, CancellationToken cancellationToken)
     {
         var roleExists = await _roleManager.RoleExistsAsync(role);
         if (!roleExists)

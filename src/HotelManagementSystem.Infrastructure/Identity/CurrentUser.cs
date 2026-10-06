@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace HotelManagementSystem.Infrastructure.Identity
 {
-    public sealed class CurrectUser(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
+    public sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
