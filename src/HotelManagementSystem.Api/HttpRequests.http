@@ -1,0 +1,54 @@
+@host = {{host}}
+@token = {{token}}
+
+### ─────────────────────────────
+### GET all hotels (paginated)
+### ─────────────────────────────
+GET {{host}}/api/Hotel?page=1&pageSize=10
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### ─────────────────────────────
+### GET hotel by id
+### ─────────────────────────────
+# @name getHotel
+GET {{host}}/api/Hotel/{{hotelId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### ─────────────────────────────
+### CREATE hotel
+### ─────────────────────────────
+# @name createHotel
+POST {{host}}/api/Hotel
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Grand Hotel",
+  "address": "123 Main St",
+  "starRating": 5
+}
+
+### Capture the created id for subsequent calls
+@hotelId = {{createHotel.response.body.$.id}}
+
+### ─────────────────────────────
+### UPDATE hotel
+### ─────────────────────────────
+PUT {{host}}/api/Hotel/{{hotelId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id": "{{hotelId}}",
+  "name": "Grand Hotel & Spa",
+  "address": "123 Main St",
+  "starRating": 5
+}
+
+### ─────────────────────────────
+### DELETE hotel
+### ─────────────────────────────
+DELETE {{host}}/api/Hotel/{{hotelId}}
+Authorization: Bearer {{token}}

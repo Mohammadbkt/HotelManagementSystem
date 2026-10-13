@@ -1,5 +1,6 @@
 using HotelManagementSystem.Application.Common;
 using HotelManagementSystem.Infrastructure;
+using HotelManagementSystem.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,12 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration );
-builder.Services.AddHttpContextAccessor();
+builder.Services.AddInfrastructure(builder.Configuration);
+
 
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+await app.InitialiseDatabaseAsync(migrate: app.Environment.IsDevelopment());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
