@@ -48,6 +48,7 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Create(
         [FromBody] CreateRoomCategoryCommand command,
         CancellationToken cancellationToken)
@@ -63,6 +64,7 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Update(
         Guid id,
         [FromBody] UpdateRoomCategoryCommand command,
@@ -79,6 +81,7 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/base-price")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> UpdateBasePrice(
         Guid id,
         [FromBody] UpdateRoomCategoryBasePriceCommand command,
@@ -95,6 +98,7 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Deactivate(
         Guid id,
         CancellationToken cancellationToken)

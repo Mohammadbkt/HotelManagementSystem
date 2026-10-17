@@ -51,6 +51,7 @@ public sealed class RoomController(ISender sender) : ApiController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Create(
         [FromBody] CreateRoomCommand command,
         CancellationToken cancellationToken)
@@ -66,6 +67,7 @@ public sealed class RoomController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/number")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> ChangeRoomNumber(
         Guid id,
         [FromBody] ChangeRoomNumberCommand command,
@@ -82,6 +84,7 @@ public sealed class RoomController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/category")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> ChangeRoomCategory(
         Guid id,
         [FromBody] ChangeRoomCategoryCommand command,
@@ -98,6 +101,7 @@ public sealed class RoomController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/clean")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> MarkAsClean(
         Guid id,
         CancellationToken cancellationToken)
@@ -112,6 +116,7 @@ public sealed class RoomController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/maintenance")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> MoveToMaintenance(
         Guid id,
         [FromBody] MoveRoomToMaintenanceCommand command,
@@ -128,6 +133,7 @@ public sealed class RoomController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/service")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> ReturnToService(
         Guid id,
         CancellationToken cancellationToken)
@@ -142,6 +148,7 @@ public sealed class RoomController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/out-of-order")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> TakeOutOfOrder(
         Guid id,
         [FromBody] TakeRoomOutOfOrderCommand command,

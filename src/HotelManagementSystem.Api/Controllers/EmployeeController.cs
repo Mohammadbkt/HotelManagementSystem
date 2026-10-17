@@ -14,11 +14,12 @@ namespace HotelManagementSystem.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public sealed class EmployeesController(ISender sender) : ApiController
+public sealed class EmployeeController(ISender sender) : ApiController
 {
     private readonly ISender _sender = sender;
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetEmployeeByIdQuery(id), cancellationToken);
@@ -26,6 +27,7 @@ public sealed class EmployeesController(ISender sender) : ApiController
     }
 
     [HttpGet]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Get([FromQuery] GetEmployeesQuery query, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
@@ -33,6 +35,7 @@ public sealed class EmployeesController(ISender sender) : ApiController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Create([FromBody] CreateEmployeeCommand command, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
@@ -40,6 +43,7 @@ public sealed class EmployeesController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEmployeeCommand command, CancellationToken cancellationToken)
     {
         if (id != command.EmployeeId) return BadRequest();
@@ -48,6 +52,7 @@ public sealed class EmployeesController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/contact-info")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> UpdateContactInfo(Guid id, [FromBody] UpdateEmployeeContactInfoCommand command, CancellationToken cancellationToken)
     {
         if (id != command.EmployeeId) return BadRequest();
@@ -56,6 +61,7 @@ public sealed class EmployeesController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/role")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> ChangeRole(Guid id, [FromBody] ChangeEmployeeRoleCommand command, CancellationToken cancellationToken)
     {
         if (id != command.EmployeeId) return BadRequest();
@@ -64,6 +70,7 @@ public sealed class EmployeesController(ISender sender) : ApiController
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new DeleteEmployeeCommand(id), cancellationToken);

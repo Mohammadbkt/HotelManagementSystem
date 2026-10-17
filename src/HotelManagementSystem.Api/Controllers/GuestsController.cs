@@ -17,6 +17,7 @@ public sealed class GuestsController(ISender sender) : ApiController
     private readonly ISender _sender = sender;
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetGuestByIdQuery(id), cancellationToken);
@@ -24,6 +25,7 @@ public sealed class GuestsController(ISender sender) : ApiController
     }
 
     [HttpGet]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Get([FromQuery] GetGuestsQuery query, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
@@ -31,6 +33,7 @@ public sealed class GuestsController(ISender sender) : ApiController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Create([FromBody] CreateGuestCommand command, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
@@ -38,6 +41,7 @@ public sealed class GuestsController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateGuestInfoCommand command, CancellationToken cancellationToken)
     {
         if (id != command.GuestId) return BadRequest();
@@ -46,6 +50,7 @@ public sealed class GuestsController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/contact-info")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> UpdateContactInfo(Guid id, [FromBody] UpdateGuestContactInfoCommand command, CancellationToken cancellationToken)
     {
         if (id != command.GuestId) return BadRequest();

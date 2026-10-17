@@ -21,6 +21,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
     private readonly ISender _sender = sender;
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetInvoiceByIdQuery(id), cancellationToken);
@@ -28,6 +29,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
     }
 
     [HttpGet]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Get([FromQuery] GetInvoicesQuery query, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
@@ -35,6 +37,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Create([FromBody] CreateInvoiceCommand command, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
@@ -42,6 +45,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
     }
 
     [HttpPost("{id:guid}/line-items")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> AddLineItem(Guid id, [FromBody] AddInvoiceLineItemCommand command, CancellationToken cancellationToken)
     {
         if (id != command.InvoiceId) return BadRequest();
@@ -50,6 +54,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/discount")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> ApplyDiscount(Guid id, [FromBody] ApplyInvoiceDiscountCommand command, CancellationToken cancellationToken)
     {
         if (id != command.InvoiceId) return BadRequest();
@@ -58,6 +63,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}/tax")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> ApplyTax(Guid id, [FromBody] ApplyInvoiceTaxCommand command, CancellationToken cancellationToken)
     {
         if (id != command.InvoiceId) return BadRequest();
@@ -66,6 +72,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
     }
 
     [HttpPost("{id:guid}/issue")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Issue(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new IssueInvoiceCommand(id), cancellationToken);
@@ -73,6 +80,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
     }
 
     [HttpPost("{id:guid}/pay")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Pay(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new PayInvoiceCommand(id), cancellationToken);
@@ -80,6 +88,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
     }
 
     [HttpPost("{id:guid}/cancel")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new CancelInvoiceCommand(id), cancellationToken);

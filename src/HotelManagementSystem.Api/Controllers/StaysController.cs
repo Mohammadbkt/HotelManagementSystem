@@ -16,6 +16,7 @@ public sealed class StaysController(ISender sender) : ApiController
     private readonly ISender _sender = sender;
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetStayByIdQuery(id), cancellationToken);
@@ -23,6 +24,7 @@ public sealed class StaysController(ISender sender) : ApiController
     }
 
     [HttpGet]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Get([FromQuery] GetStaysQuery query, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
@@ -30,6 +32,7 @@ public sealed class StaysController(ISender sender) : ApiController
     }
 
     [HttpPost("check-in")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> CheckIn([FromBody] CheckInGuestCommand command, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
@@ -37,6 +40,7 @@ public sealed class StaysController(ISender sender) : ApiController
     }
 
     [HttpPost("{id:guid}/check-out")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> CheckOut(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new CheckOutGuestCommand(id), cancellationToken);

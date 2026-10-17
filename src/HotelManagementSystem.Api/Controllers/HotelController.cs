@@ -1,7 +1,9 @@
+using HotelManagementSystem.Application.Common;
 using HotelManagementSystem.Application.Features.Hotels.Commands.CreateHotel;
 using HotelManagementSystem.Application.Features.Hotels.Commands.UpdateHotel;
 using HotelManagementSystem.Application.Features.Hotels.Queries.GetHotelById;
 using HotelManagementSystem.Application.Features.Hotels.Queries.GetHotels;
+using HotelManagementSystem.Domain.Entities.Employee;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +44,7 @@ namespace HotelManagementSystem.Api.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Create([FromBody] CreateHotelCommand command, CancellationToken cancellationToken)
         {
             var result = await _sender.Send(command, cancellationToken);
@@ -52,6 +55,8 @@ namespace HotelManagementSystem.Api.Controllers
         }
 
         [HttpPut("{id:Guid}")]
+        [Authorize(Roles = "Manager")]
+
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateHotelCommand command, CancellationToken cancellationToken)
         {
 

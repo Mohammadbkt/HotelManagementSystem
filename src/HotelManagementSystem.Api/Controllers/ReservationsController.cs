@@ -18,6 +18,7 @@ public sealed class ReservationsController(ISender sender) : ApiController
     private readonly ISender _sender = sender;
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetReservationByIdQuery(id), cancellationToken);
@@ -25,6 +26,7 @@ public sealed class ReservationsController(ISender sender) : ApiController
     }
 
     [HttpGet]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Get([FromQuery] GetReservationsQuery query, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
@@ -32,6 +34,7 @@ public sealed class ReservationsController(ISender sender) : ApiController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Create([FromBody] CreateReservationsCommand command, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
@@ -39,6 +42,7 @@ public sealed class ReservationsController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateReservationCommand command, CancellationToken cancellationToken)
     {
         if (id != command.ReservationId) return BadRequest();
@@ -47,6 +51,7 @@ public sealed class ReservationsController(ISender sender) : ApiController
     }
 
     [HttpPost("{id:guid}/confirm")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Confirm(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new ConfirmReservationCommand(id), cancellationToken);
@@ -54,6 +59,7 @@ public sealed class ReservationsController(ISender sender) : ApiController
     }
 
     [HttpPost("{id:guid}/cancel")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new CancelReservationCommand(id), cancellationToken);
