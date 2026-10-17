@@ -71,6 +71,11 @@ public sealed class IdentityServices(
         return Result<AppUserDto>.Success(userDto);
     }
 
+    public Task<Result> ChangePasswordAsync(Guid userId, string currentPassword, string newPassword, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Result<AppUserDto>> CreateUserAsync(string email, string username, string password, string firstName, string lastName, string? phoneNumber, string role, CancellationToken cancellationToken)
     {
         var roleExists = await _roleManager.RoleExistsAsync(role);
@@ -136,6 +141,25 @@ public sealed class IdentityServices(
         return Result<AppUserDto>.Success(userDto);
     }
 
+    public async Task<Result> DeleteUserAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            return Result.Success();
+
+        user.IsDeleted = true;
+
+        await _userManager.SetLockoutEnabledAsync(user, true);
+
+        await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+
+        var result = await _userManager.DeleteAsync(user);
+        return result.Succeeded
+            ? Result.Success()
+            : Result.Failure(result.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToList());
+
+    }
+
     public async Task<Result<AppUserDto>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -166,20 +190,55 @@ public sealed class IdentityServices(
         return user.UserName;
     }
 
-    public async Task<bool> IsInRoleAsync(Guid userId, EmployeeRole role)
+    public Task<Result> ResetPasswordAsync(Guid userId, string newPassword, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<bool> RoleExistsAsync(string role)
+    {
+        return await _roleManager.RoleExistsAsync(role);
+    }
+
+    public async Task<Result> SetRoleAsync(Guid userId, string role, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-
-        if (user is null)
+        if (user == null)
         {
-            _logger.LogWarning("User not found for Id '{UserId}' when checking role.", userId);
-            return false;
+            _logger.LogWarning("User not found for Id '{UserId}' when setting role.", userId);
+            return Result.Failure(Error.NotFound("Auth.UserNotFound", $"User with ID '{userId}' not found."));
         }
 
-        var roleName = role.ToString();
-        var isInRole = await _userManager.IsInRoleAsync(user, roleName);
+        var roleExists = await _roleManager.RoleExistsAsync(role);
+        if (!roleExists)
+        {
+            _logger.LogWarning("Role '{Role}' does not exist when setting role for user '{UserId}'.", role, userId);
+            return Result.Failure(Error.NotFound("Auth.RoleNotFound", $"Role '{role}' not found."));
+        }
 
-        return isInRole;
+        var currentRoles = await _userManager.GetRolesAsync(user);
+        if (!currentRoles.Contains(role))
+        {
+            var add = await _userManager.AddToRoleAsync(user, role);
+            if (!add.Succeeded)
+                return Result.Failure(add.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToList());
+        }
+
+
+        var stale = currentRoles
+                     .Where(r => r != role)
+                     .ToList();
+
+        if (stale.Count > 0)
+        {
+            var remove = await _userManager.RemoveFromRolesAsync(user, stale);
+            if (!remove.Succeeded)
+                return Result.Failure(remove.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToList());
+        }
+
+        await _userManager.UpdateSecurityStampAsync(user);
+        return Result.Success();
+
     }
 
     private async Task<AppUserDto> ToDtoAsync(AppUser user, CancellationToken ct)

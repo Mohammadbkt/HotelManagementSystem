@@ -1,4 +1,5 @@
 using HotelManagementSystem.Domain.Entities.Identity;
+using HotelManagementSystem.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -34,10 +35,16 @@ public sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<Refresh
         builder.Property(t => t.RevokedAt);
 
 
-        builder.HasIndex(t => t.Token).IsUnique();
+        builder.HasOne<AppUser>()
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
         builder.HasIndex(t => t.UserId);
+
+
+        builder.HasIndex(t => t.Token).IsUnique();
 
     }
 }

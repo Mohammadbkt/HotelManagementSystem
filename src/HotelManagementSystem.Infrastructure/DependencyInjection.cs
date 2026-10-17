@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Infrastructure.Data;
@@ -15,8 +17,16 @@ namespace HotelManagementSystem.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration, IOptions<JwtOptions> jwtOptions)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.SectionName))
+            .Validate(o => Encoding.UTF8.GetBytes(o.Secret).Length >= 32, "JWT secret must be at least 32 bytes")
+            .ValidateOnStart();
+
+        services.AddHttpContextAccessor();
+        services.AddSingleton(TimeProvider.System);
+
         services.AddScoped<AuditableEntityInterceptor>();
 
         services.AddDbContext<AppDbContext>((sp, options) =>
@@ -42,34 +52,38 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IAccessTokenGenerator, JwtService>();
 
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
+        // Registers the scheme only; the settings come from the Configure<> block below.
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer();
+
+        services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IOptions<JwtOptions>>((bearer, jwt) =>
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtOptions.Value.Secret)),
+                var o = jwt.Value;
 
-                ValidateIssuer = true,
-                ValidIssuer = jwtOptions.Value.Issuer,
+                bearer.MapInboundClaims = false;   // keep "sub" as "sub"
+                bearer.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(o.Secret)),
 
-                ValidateAudience = true,
-                ValidAudience = jwtOptions.Value.Audience,
+                    ValidateIssuer = true,
+                    ValidIssuer = o.Issuer,
 
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-        });
-        
-        services.AddSingleton(TimeProvider.System);
+                    ValidateAudience = true,
+                    ValidAudience = o.Audience,
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+
+                    NameClaimType = JwtRegisteredClaimNames.UniqueName,
+                    RoleClaimType = ClaimTypes.Role
+                };
+            });
+
+
+        services.AddScoped<AppDbContextInitializer>();
 
         return services;
-
-
     }
 }

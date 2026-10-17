@@ -12,6 +12,7 @@ using HotelManagementSystem.Domain.Entities.Rooms;
 using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
 using HotelManagementSystem.Domain.Entities.Stays;
 using HotelManagementSystem.Infrastructure.Identity;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,11 @@ namespace HotelManagementSystem.Infrastructure.Data
 {
     public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>, IAppDbContext
     {
+
+        private readonly IMediator _mediator = default!;
+
+
+
         public DbSet<Hotel> Hotels => Set<Hotel>();
 
         public DbSet<Employee> Employees => Set<Employee>();
@@ -42,15 +48,35 @@ namespace HotelManagementSystem.Infrastructure.Data
 
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
-        public AppDbContext(DbContextOptions<AppDbContext> options)
+        public AppDbContext(DbContextOptions<AppDbContext> options, IMediator mediator)
         : base(options)
         {
-
+            _mediator = mediator;
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            return await base.SaveChangesAsync(cancellationToken);
+            var entitiesWithEvents = ChangeTracker
+                .Entries<Entity>()
+                .Where(entry => entry.Entity.DomainEvents.Count > 0)
+                .Select(entry => entry.Entity)
+                .ToList();
+
+            var domainEvents = entitiesWithEvents
+                .SelectMany(entity => entity.DomainEvents)
+                .ToList();
+
+
+            entitiesWithEvents.ForEach(entity => entity.ClearDomainEvents());
+           
+            var result = await base.SaveChangesAsync(cancellationToken);
+
+            foreach (var domainEvent in domainEvents)
+            {
+                await _mediator.Publish(domainEvent, cancellationToken);
+            }
+
+            return result;
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -71,7 +97,14 @@ namespace HotelManagementSystem.Infrastructure.Data
 
             builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
-            
+
+            foreach (var entityType in builder.Model.GetEntityTypes()
+                        .Where(t => t.BaseType is null && typeof(Entity).IsAssignableFrom(t.ClrType))
+                        .ToList())
+            {
+                builder.Entity(entityType.ClrType).Property(nameof(Entity.Id)).ValueGeneratedNever();
+            }
+
             foreach (var entityType in builder.Model.GetEntityTypes()
                          .Where(t => t.BaseType is null && typeof(ISoftDeletable).IsAssignableFrom(t.ClrType))
                          .ToList())

@@ -1,4 +1,6 @@
+using HotelManagementSystem.Domain.Entities.Hotels;
 using HotelManagementSystem.Domain.Entities.Rooms;
+using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -30,8 +32,23 @@ namespace HotelManagementSystem.Infrastructure.Data.Configurations
             builder.Property(r => r.RoomCategoryId)
                 .IsRequired();
 
+            builder.HasOne<Hotel>()
+                .WithMany()
+                .HasForeignKey(r => r.HotelId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne<RoomCategory>()
+                .WithMany()
+                .HasForeignKey(r => r.RoomCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(r => r.HotelId);
+            
+            builder.HasIndex(r => r.RoomCategoryId);
+
             builder.HasIndex(r => new { r.HotelId, r.RoomNumber })
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");
 
 
         }

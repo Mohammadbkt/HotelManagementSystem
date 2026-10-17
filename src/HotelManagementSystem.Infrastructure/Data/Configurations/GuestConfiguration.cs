@@ -1,6 +1,7 @@
 using HotelManagementSystem.Domain.Entities.Guests;
 using HotelManagementSystem.Domain.ValueObjects.Email;
 using HotelManagementSystem.Domain.ValueObjects.PhoneNumber;
+using HotelManagementSystem.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementSystem.Infrastructure.Data.Configurations;
@@ -21,6 +22,11 @@ public sealed class GuestConfiguration : IEntityTypeConfiguration<Guest>
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.HasOne<AppUser>()
+            .WithOne()
+            .HasForeignKey<Guest>(g => g.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.ComplexProperty<PhoneNumber>(h => h.PhoneNumber, p =>
         {
             p.Property(x => x.Value)
@@ -35,8 +41,9 @@ public sealed class GuestConfiguration : IEntityTypeConfiguration<Guest>
              .HasColumnName("Email");
         });
 
-
-
+        builder.Property(e => e.DateOfBirth)
+            .IsRequired()
+            .HasColumnType("date");
 
     }
 }
