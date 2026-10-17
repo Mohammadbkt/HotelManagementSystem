@@ -40,6 +40,10 @@ public sealed class Guest : SoftDeletableEntity
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
+        if (email is null && phoneNumber is null)
+            return Result<Guest>.Failure(GuestErrors.AtLeastOneContactRequired);
+
+
         if (string.IsNullOrWhiteSpace(firstName))
             return Result<Guest>.Failure(GuestErrors.FirstNameRequired);
 
@@ -93,6 +97,10 @@ public sealed class Guest : SoftDeletableEntity
 
     public Result UpdateContactInfo(EmailAddress? email, PhoneNumber? phoneNumber)
     {
+
+        if (email is null && phoneNumber is null)
+            return Result.Failure(GuestErrors.AtLeastOneContactRequired);
+
         Email = email;
         PhoneNumber = phoneNumber;
 

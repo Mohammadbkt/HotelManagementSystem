@@ -12,7 +12,7 @@ namespace HotelManagementSystem.Domain.Entities.Employee
         public string LastName { get; private set; } = default!;
         public PhoneNumber? PhoneNumber { get; private set; }
         public EmailAddress EmailAddress { get; private set; }
-        public Guid? UserId { get; private set; }
+        public Guid UserId { get; private set; }
         public DateOnly DateOfBirth { get; private set; }
         public EmployeeRole Role { get; private set; }
         public string FullName => $"{FirstName} {LastName}";
@@ -21,22 +21,29 @@ namespace HotelManagementSystem.Domain.Entities.Employee
         {
         }
 
-        private Employee(Guid id, Guid hotelId, string firstName, string lastName, PhoneNumber? phoneNumber, EmailAddress emailAddress, EmployeeRole role)
+        private Employee(Guid id, Guid hotelId, Guid userId, string firstName, string lastName, PhoneNumber? phoneNumber, EmailAddress emailAddress, DateOnly dateOfBirth, EmployeeRole role)
             : base(id)
         {
             HotelId = hotelId;
+            UserId = userId;
             FirstName = firstName;
             LastName = lastName;
             PhoneNumber = phoneNumber;
             EmailAddress = emailAddress;
+            DateOfBirth = dateOfBirth;
             Role = role;
         }
 
-        public static Result<Employee> Create(Guid hotelId, string firstName, string lastName, PhoneNumber? phoneNumber, EmailAddress emailAddress, EmployeeRole role)
+        public static Result<Employee> Create(Guid hotelId, Guid userId, string firstName, string lastName, PhoneNumber? phoneNumber, EmailAddress emailAddress, DateOnly dateOfBirth, EmployeeRole role)
         {
             if (hotelId == Guid.Empty)
             {
                 return Result<Employee>.Failure(EmployeeErrors.HotelIdRequired);
+            }
+
+            if (userId == Guid.Empty)
+            {
+                return Result<Employee>.Failure(EmployeeErrors.UserIdRequired);
             }
 
             if (string.IsNullOrWhiteSpace(firstName))
@@ -54,7 +61,7 @@ namespace HotelManagementSystem.Domain.Entities.Employee
                 return Result<Employee>.Failure(EmployeeErrors.RoleInvalid);
             }
 
-            return Result<Employee>.Success(new Employee(Guid.NewGuid(), hotelId, firstName.Trim(), lastName.Trim(), phoneNumber, emailAddress, role));
+            return Result<Employee>.Success(new Employee(Guid.NewGuid(), hotelId, userId, firstName.Trim(), lastName.Trim(), phoneNumber, emailAddress, dateOfBirth, role));
         }
 
         public Result ChangeRole(EmployeeRole role)
@@ -94,13 +101,5 @@ namespace HotelManagementSystem.Domain.Entities.Employee
             return Result.Success();
         }
 
-        public Result LinkToUserAccount(Guid userId)
-        {
-            if (UserId is not null)
-                return Result.Failure(EmployeeErrors.AlreadyLinkedToAccount);
-
-            UserId = userId;
-            return Result.Success();
-        }
     }
 }

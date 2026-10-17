@@ -30,16 +30,16 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.CreateEm
                 .WithMessage("Last name must be 100 characters or fewer.");
 
             // Email is required — both presence and format.
-            RuleFor(x => x.Email)
-                .NotEmpty()
-                .WithErrorCode("Employee.EmailRequired")
-                .WithMessage("Email is required.");
+            // RuleFor(x => x.Email)
+            //     .NotEmpty()
+            //     .WithErrorCode("Employee.EmailRequired")
+            //     .WithMessage("Email is required.");
 
-            RuleFor(x => x.Email)
-                .Must(BeAValidEmail)
-                .When(x => !string.IsNullOrWhiteSpace(x.Email))
-                .WithErrorCode("Employee.EmailInvalid")
-                .WithMessage("Email is invalid.");
+            // RuleFor(x => x.Email)
+            //     .Must(BeAValidEmail)
+            //     .When(x => !string.IsNullOrWhiteSpace(x.Email))
+            //     .WithErrorCode("Employee.EmailInvalid")
+            //     .WithMessage("Email is invalid.");
 
             // Phone is optional — only validate format when present.
             RuleFor(x => x.PhoneNumber)

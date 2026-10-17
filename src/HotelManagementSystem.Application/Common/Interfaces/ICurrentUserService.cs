@@ -1,3 +1,5 @@
+using HotelManagementSystem.Domain.ValueObjects.Email;
+
 namespace HotelManagementSystem.Application.Common.Interfaces
 {
     public interface ICurrentUserService
@@ -5,6 +7,7 @@ namespace HotelManagementSystem.Application.Common.Interfaces
         Guid? UserId { get; }
         string? UserName { get; }
         Guid? HotelId { get; }
+        EmailAddress Email { get; }
         IReadOnlyCollection<string> Roles { get; }
         bool IsAuthenticated { get; }
     }

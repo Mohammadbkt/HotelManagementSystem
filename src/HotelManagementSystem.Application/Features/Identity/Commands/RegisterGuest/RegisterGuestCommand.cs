@@ -2,9 +2,9 @@ using HotelManagementSystem.Application.Features.Identity.Dtos;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
 
-namespace HotelManagementSystem.Application.Features.Identity.Commands.Register
+namespace HotelManagementSystem.Application.Features.Identity.Commands.RegisterGuest
 {
-    public sealed record RegisterCommand(
+    public sealed record RegisterGuestCommand(
         string Email,
         string Username,
         string Password,

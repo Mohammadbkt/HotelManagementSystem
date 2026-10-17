@@ -54,6 +54,11 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
                 "Room.StatusReasonTooLong",
                 "Status reason is too long."); 
 
+        public static Error StatusReasonRequired => 
+            Error.Validation(
+                "Room.StatusReasonRequired", 
+                "A reason is required when taking a room out of service.");
+
         public static Error CannotUpdateOccupiedRoom => 
         Error.Validation(
             "Room.CannotUpdateOccupiedRoom", 

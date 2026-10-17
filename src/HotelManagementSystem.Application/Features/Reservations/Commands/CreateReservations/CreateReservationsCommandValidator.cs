@@ -6,10 +6,6 @@ namespace HotelManagementSystem.Application.Features.Reservations.Commands.Creat
     {
         public CreateReservationsCommandValidator()
         {
-            RuleFor(x => x.GuestId)
-                .NotEmpty()
-                .WithMessage("Guest ID is required.");
-
             RuleFor(x => x.RoomId)
                 .NotEmpty()
                 .WithMessage("Room ID is required.");

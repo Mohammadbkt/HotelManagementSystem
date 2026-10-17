@@ -113,6 +113,11 @@ public static class ApplicationErrors
             Error.Conflict(
                 "Employee.AlreadyExists",
                 "An employee with the same information already exists.");
+
+        public static readonly Error CannotDeleteSelf = 
+            Error.Forbidden(
+                "CannotDeleteSelf", 
+                "Cannot Delete Self.");
     }
 
     public static class Reservation

@@ -36,4 +36,9 @@ public static class GuestErrors
     Error.NotFound(
         "Guest.NotFound",
         " guest not found.");
+
+    public static Error AmbiguousMatch =>
+    Error.Conflict(
+        "Guest.AmbiguousMatch",
+        "Multiple guests found with the same email or phone number.");
 }

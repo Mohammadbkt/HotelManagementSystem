@@ -47,6 +47,7 @@ public sealed class StayCheckedOutEventHandler(IAppDbContext context, ILogger<St
         }
 
         await _context.Invoices.AddAsync(invoiceResult.Value, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
 
     }
 }

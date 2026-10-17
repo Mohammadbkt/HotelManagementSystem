@@ -1,11 +1,11 @@
 using FluentValidation;
-using HotelManagementSystem.Application.Features.Identity.Commands.Register;
+using HotelManagementSystem.Application.Features.Identity.Commands.RegisterGuest;
 
 namespace HotelManagementSystem.Application.Validators.Identity;
 
-public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand>
+public sealed class RegisterGuestCommandValidator : AbstractValidator<RegisterGuestCommand>
 {
-    public RegisterCommandValidator()
+    public RegisterGuestCommandValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required")

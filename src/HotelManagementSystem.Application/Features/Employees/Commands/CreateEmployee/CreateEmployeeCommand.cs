@@ -6,10 +6,10 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.CreateEm
 {
     public sealed record CreateEmployeeCommand(
         Guid HotelId,
+        Guid UserId,
         string FirstName,
         string LastName,
         string? PhoneNumber,
-        string? Email,
         DateOnly DateOfBirth,
         EmployeeRole Role
     ) : IRequest<Result<Guid>>;

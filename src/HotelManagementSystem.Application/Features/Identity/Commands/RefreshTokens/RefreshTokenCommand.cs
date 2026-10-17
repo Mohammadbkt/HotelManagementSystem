@@ -5,5 +5,7 @@ using MediatR;
 namespace HotelManagementSystem.Application.Features.Identity.Commands.RefreshTokens;
 
     public sealed record RefreshTokenCommand(
-    string RefreshToken
+    string RefreshToken,
+    string DeviceName,
+    string IpAddress
     ) : IRequest<Result<AuthResponseDto>>;

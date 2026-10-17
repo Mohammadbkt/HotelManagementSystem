@@ -19,5 +19,9 @@ namespace HotelManagementSystem.Domain.ValueObjects.Money
 
         public static readonly Error CurrencyMismatch =
             Error.Validation("Money.CurrencyMismatch", "Cannot perform operations on money with different currencies.");
+
+        public static readonly Error DivideByZero = 
+            Error.Validation("Money.DivideByZero", "Cannot devide by zero.");
+
     }
 }

@@ -7,11 +7,15 @@ using Microsoft.Extensions.Logging;
 
 namespace HotelManagementSystem.Application.Features.Employees.Commands.ChangeEmployeeRole
 {
-    public sealed class ChangeEmployeeRoleCommandHandler(IAppDbContext context, ILogger<ChangeEmployeeRoleCommandHandler> logger)
+    public sealed class ChangeEmployeeRoleCommandHandler(
+        IAppDbContext context,
+        ILogger<ChangeEmployeeRoleCommandHandler> logger,
+        IIdentityService identityService)
         : IRequestHandler<ChangeEmployeeRoleCommand, Result>
     {
         private readonly IAppDbContext _context = context;
         private readonly ILogger<ChangeEmployeeRoleCommandHandler> _logger = logger;
+        private readonly IIdentityService _identityService = identityService;
 
         public async Task<Result> Handle(
             ChangeEmployeeRoleCommand request,
@@ -34,6 +38,12 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.ChangeEm
                     roleResult.Errors);
 
                 return Result.Failure(roleResult.Errors);
+            }
+
+            if (employee.UserId is { } userId)
+            {
+                var r = await _identityService.SetRoleAsync(userId, request.NewRole.ToString(), cancellationToken);
+                if (r.IsError) return Result.Failure(r.Errors);
             }
 
             await _context.SaveChangesAsync(cancellationToken);

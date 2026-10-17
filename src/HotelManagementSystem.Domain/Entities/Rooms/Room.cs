@@ -39,7 +39,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
 
         public Result ChangeRoomNumber(string roomNumber)
         {
-            if (Status != RoomStatus.CleanVacant)
+            if (Status == RoomStatus.Occupied)
                 return Result.Failure(RoomErrors.CannotUpdateOccupiedRoom);
 
 
@@ -100,7 +100,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             if (Status == RoomStatus.Occupied)
                 return Result.Failure(RoomErrors.CannotTakeOccupiedRoomOutOfOrder);
 
-            var reasonResult = ValidateStatusReason(reason);
+            var reasonResult = ValidateStatusReason(reason, required: true);
             if (reasonResult.IsError)
                 return Result.Failure(reasonResult.Errors);
 
@@ -124,7 +124,7 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             if (Status == RoomStatus.Occupied)
                 return Result.Failure(RoomErrors.CannotMoveOccupiedToMaintenance);
 
-            var reasonResult = ValidateStatusReason(reason);
+            var reasonResult = ValidateStatusReason(reason, required: true);
             if (reasonResult.IsError)
                 return Result.Failure(reasonResult.Errors);
 
@@ -133,12 +133,21 @@ namespace HotelManagementSystem.Domain.Entities.Rooms
             return Result.Success();
         }
 
-        private static Result<string?> ValidateStatusReason(string? reason)
+        private static Result<string?> ValidateStatusReason(string? reason, bool required)
         {
-            if (reason?.Trim().Length > 500)
+            var trimmed = reason?.Trim();
+
+            if (string.IsNullOrEmpty(trimmed))
+            {
+                return required
+                    ? Result<string?>.Failure(RoomErrors.StatusReasonRequired)
+                    : Result<string?>.Success(null);
+            }
+
+            if (trimmed.Length > 500)
                 return Result<string?>.Failure(RoomErrors.StatusReasonTooLong);
 
-            return Result<string?>.Success(reason?.Trim());
+            return Result<string?>.Success(trimmed);
         }
 
     }

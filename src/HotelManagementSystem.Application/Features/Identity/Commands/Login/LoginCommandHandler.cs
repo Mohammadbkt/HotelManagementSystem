@@ -8,12 +8,14 @@ using Microsoft.Extensions.Logging;
 namespace HotelManagementSystem.Application.Features.Identity.Commands.Login
 {
     public sealed class LoginCommandHandler(
+            IAppDbContext _context,
             IIdentityService identity,
             IRefreshTokenService refreshTokenService,
             IAccessTokenGenerator jwtService,
             ILogger<LoginCommandHandler> logger
             ) : IRequestHandler<LoginCommand, Result<AuthResponseDto>>
     {
+        private readonly IAppDbContext _context = _context;
         private readonly IIdentityService _identity = identity;
         private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
         private readonly IAccessTokenGenerator _jwtService = jwtService;
@@ -42,7 +44,7 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.Login
                 return Result<AuthResponseDto>.Failure(accessTokenResult.Errors);
             }
 
-            var refreshTokenResult = await _refreshTokenService.CreateAsync(user.Id, request.DeviceName, request.IpAddress, cancellationToken);
+            var refreshTokenResult = _refreshTokenService.Create(user.Id, request.DeviceName, request.IpAddress);
             if (refreshTokenResult.IsError)
             {
                 _logger.LogError("Refresh token generation failed: {Error}", refreshTokenResult.TopError.Description);
@@ -50,6 +52,9 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.Login
             }
 
             _logger.LogInformation("User {UserId} logged in successfully", user.Id);
+
+            await _context.RefreshTokens.AddAsync(refreshTokenResult.Value, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return Result<AuthResponseDto>.Success(
                 new AuthResponseDto(

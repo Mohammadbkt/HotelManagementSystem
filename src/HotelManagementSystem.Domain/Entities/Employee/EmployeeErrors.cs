@@ -8,6 +8,10 @@ namespace HotelManagementSystem.Domain.Entities.Employee
 {
     public static class EmployeeErrors
     {
+        public static Error UserIdRequired => Error.Validation(
+            "Employee.UserIdRequired",
+            "Employee User Id is required");
+
         public static Error FirstNameRequired => Error.Validation(
             "Employee.FirstNameRequired",
             "Employee First Name is required");
