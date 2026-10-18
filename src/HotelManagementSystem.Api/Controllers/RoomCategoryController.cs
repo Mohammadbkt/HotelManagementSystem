@@ -28,9 +28,11 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
 
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.Match(
-            response => Ok(response),
-            Problem);
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
+
     }
 
     [HttpGet]
@@ -42,9 +44,12 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
     {
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.Match(
-            response => Ok(response),
-            Problem);
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
+
+
     }
 
     [HttpPost]
@@ -55,12 +60,12 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
     {
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.Match(
-            id => CreatedAtAction(
-                nameof(GetById),
-                new { id },
-                new { RoomCategoryId = id }),
-            Problem);
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(GetById), new { RoomCategroyId = result.Value }, result.Value);
+        else
+            return Problem(result.Errors.ToList());
+
+
     }
 
     [HttpPut("{id:guid}")]
@@ -75,9 +80,11 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
 
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
+
     }
 
     [HttpPut("{id:guid}/base-price")]
@@ -92,9 +99,11 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
 
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
+
     }
 
     [HttpDelete("{id:guid}")]
@@ -107,8 +116,10 @@ public sealed class RoomCategoryController(ISender sender) : ApiController
 
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
+
     }
 }

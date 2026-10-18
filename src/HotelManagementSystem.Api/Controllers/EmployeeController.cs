@@ -23,7 +23,11 @@ public sealed class EmployeeController(ISender sender) : ApiController
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetEmployeeByIdQuery(id), cancellationToken);
-        return result.Match(response => Ok(response), Problem);
+
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpGet]
@@ -31,7 +35,11 @@ public sealed class EmployeeController(ISender sender) : ApiController
     public async Task<IActionResult> Get([FromQuery] GetEmployeesQuery query, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
-        return result.Match(response => Ok(response), Problem);
+
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpPost]
@@ -39,16 +47,25 @@ public sealed class EmployeeController(ISender sender) : ApiController
     public async Task<IActionResult> Create([FromBody] CreateEmployeeCommand command, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
-        return result.Match(id => CreatedAtAction(nameof(GetById), new { id }, new { EmployeeId = id }), Problem);
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEmployeeCommand command, CancellationToken cancellationToken)
     {
-        if (id != command.EmployeeId) return BadRequest();
+        if (id != command.EmployeeId)
+            return Problem();
+
         var result = await _sender.Send(command, cancellationToken);
-        return result.IsSuccess ? NoContent() : Problem(result.Errors.ToList());
+
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpPut("{id:guid}/contact-info")]
@@ -57,7 +74,10 @@ public sealed class EmployeeController(ISender sender) : ApiController
     {
         if (id != command.EmployeeId) return BadRequest();
         var result = await _sender.Send(command, cancellationToken);
-        return result.IsSuccess ? NoContent() : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpPut("{id:guid}/role")]
@@ -66,7 +86,11 @@ public sealed class EmployeeController(ISender sender) : ApiController
     {
         if (id != command.EmployeeId) return BadRequest();
         var result = await _sender.Send(command, cancellationToken);
-        return result.IsSuccess ? NoContent() : Problem(result.Errors.ToList());
+
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpDelete("{id:guid}")]
@@ -74,6 +98,10 @@ public sealed class EmployeeController(ISender sender) : ApiController
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new DeleteEmployeeCommand(id), cancellationToken);
-        return result.IsSuccess ? NoContent() : Problem(result.Errors.ToList());
+        
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
     }
 }

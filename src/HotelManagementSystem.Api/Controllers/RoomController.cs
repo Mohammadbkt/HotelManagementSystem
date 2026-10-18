@@ -31,9 +31,10 @@ public sealed class RoomController(ISender sender) : ApiController
 
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.Match(
-            response => Ok(response),
-            Problem);
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpGet]
@@ -44,10 +45,11 @@ public sealed class RoomController(ISender sender) : ApiController
         CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
-
-        return result.Match(
-            response => Ok(response),
-            Problem);
+        
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpPost]
@@ -58,12 +60,10 @@ public sealed class RoomController(ISender sender) : ApiController
     {
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.Match(
-            roomId => CreatedAtAction(
-                nameof(GetById),
-                new { id = roomId },
-                roomId),
-            Problem);
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(GetById), new { roomId = result.Value }, result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpPut("{id:guid}/number")]
@@ -78,9 +78,11 @@ public sealed class RoomController(ISender sender) : ApiController
 
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
+
     }
 
     [HttpPut("{id:guid}/category")]
@@ -95,9 +97,11 @@ public sealed class RoomController(ISender sender) : ApiController
 
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
+
     }
 
     [HttpPut("{id:guid}/clean")]
@@ -110,9 +114,11 @@ public sealed class RoomController(ISender sender) : ApiController
 
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
+
     }
 
     [HttpPut("{id:guid}/maintenance")]
@@ -127,9 +133,11 @@ public sealed class RoomController(ISender sender) : ApiController
 
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
+
     }
 
     [HttpPut("{id:guid}/service")]
@@ -142,9 +150,11 @@ public sealed class RoomController(ISender sender) : ApiController
 
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
+
     }
 
     [HttpPut("{id:guid}/out-of-order")]
@@ -159,8 +169,10 @@ public sealed class RoomController(ISender sender) : ApiController
 
         var result = await _sender.Send(command, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : Problem(result.Errors.ToList());
+        if (result.IsSuccess)
+            return NoContent();
+        else
+            return Problem(result.Errors.ToList());
+
     }
 }

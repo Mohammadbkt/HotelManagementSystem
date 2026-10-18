@@ -25,7 +25,11 @@ public sealed class InvoicesController(ISender sender) : ApiController
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetInvoiceByIdQuery(id), cancellationToken);
-        return result.Match(response => Ok(response), Problem);
+
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpGet]
@@ -33,7 +37,11 @@ public sealed class InvoicesController(ISender sender) : ApiController
     public async Task<IActionResult> Get([FromQuery] GetInvoicesQuery query, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
-        return result.Match(response => Ok(response), Problem);
+
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpPost]
@@ -41,7 +49,11 @@ public sealed class InvoicesController(ISender sender) : ApiController
     public async Task<IActionResult> Create([FromBody] CreateInvoiceCommand command, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
-        return result.Match(id => CreatedAtAction(nameof(GetById), new { id }, new { InvoiceId = id }), Problem);
+
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpPost("{id:guid}/line-items")]

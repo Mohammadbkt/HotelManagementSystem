@@ -20,7 +20,11 @@ public sealed class StaysController(ISender sender) : ApiController
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetStayByIdQuery(id), cancellationToken);
-        return result.Match(response => Ok(response), Problem);
+
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpGet]
@@ -28,7 +32,11 @@ public sealed class StaysController(ISender sender) : ApiController
     public async Task<IActionResult> Get([FromQuery] GetStaysQuery query, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
-        return result.Match(response => Ok(response), Problem);
+
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        else
+            return Problem(result.Errors.ToList());
     }
 
     [HttpPost("check-in")]
@@ -36,7 +44,12 @@ public sealed class StaysController(ISender sender) : ApiController
     public async Task<IActionResult> CheckIn([FromBody] CheckInGuestCommand command, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(command, cancellationToken);
-        return result.Match(id => CreatedAtAction(nameof(GetById), new { id }, new { StayId = id }), Problem);
+
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(GetById), new { stayId = result.Value }, new { result.Value });
+            else
+            return Problem(result.Errors.ToList());
+
     }
 
     [HttpPost("{id:guid}/check-out")]
