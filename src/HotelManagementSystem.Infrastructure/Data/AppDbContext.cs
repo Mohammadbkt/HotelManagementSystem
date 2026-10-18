@@ -16,6 +16,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace HotelManagementSystem.Infrastructure.Data
 {
@@ -48,6 +49,8 @@ namespace HotelManagementSystem.Infrastructure.Data
 
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
+        DatabaseFacade IAppDbContext.Database => Database;
+
         public AppDbContext(DbContextOptions<AppDbContext> options, IMediator mediator)
         : base(options)
         {
@@ -68,7 +71,7 @@ namespace HotelManagementSystem.Infrastructure.Data
 
 
             entitiesWithEvents.ForEach(entity => entity.ClearDomainEvents());
-           
+
             var result = await base.SaveChangesAsync(cancellationToken);
 
             foreach (var domainEvent in domainEvents)
