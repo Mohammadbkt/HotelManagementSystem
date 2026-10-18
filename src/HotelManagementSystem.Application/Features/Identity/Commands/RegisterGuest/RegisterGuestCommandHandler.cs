@@ -65,12 +65,8 @@ public sealed class RegisterGuestCommandHandler(
 
         var guest = matches.SingleOrDefault();
 
-        if (guest is not null)
+        if (guest is not null && guest.UserId is not null)
             return Result<AuthResponseDto>.Failure(ApplicationErrors.GuestErrors.AlreadyExists);
-
-        if (guest?.UserId is not null)
-            return Result<AuthResponseDto>.Failure(
-                GuestErrors.AlreadyLinkedToAccount);
 
         var isNewGuest = guest is null;
 

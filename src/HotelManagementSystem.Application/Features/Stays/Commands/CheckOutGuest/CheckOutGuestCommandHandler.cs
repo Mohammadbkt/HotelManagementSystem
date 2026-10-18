@@ -59,7 +59,6 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckOutGues
             }
 
 
-
             await _context.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("Stay {StayId} checked out", request.StayId);

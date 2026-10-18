@@ -9,6 +9,7 @@ using HotelManagementSystem.Domain.Entities.Rooms;
 using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
 using HotelManagementSystem.Domain.Entities.Stays;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace HotelManagementSystem.Application.Common.Interfaces
 {
@@ -25,6 +26,8 @@ namespace HotelManagementSystem.Application.Common.Interfaces
         public DbSet<InvoiceLineItem> InvoiceLineItems { get; }
         public DbSet<Payment> Payments { get; }
         public DbSet<RefreshToken> RefreshTokens { get; }
+
+        public DatabaseFacade Database { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 
