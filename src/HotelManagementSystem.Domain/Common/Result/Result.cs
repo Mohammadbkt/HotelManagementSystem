@@ -125,17 +125,17 @@ namespace HotelManagementSystem.Domain.Common.Result
                 "A successful result has no errors.")
             : _errors[0];
 
-        public TNextValue Match<TNextValue>(
-        Func<TValue, TNextValue> onValue,
-        Func<List<Error>, TNextValue> onError)
-        {
-            ArgumentNullException.ThrowIfNull(onValue);
-            ArgumentNullException.ThrowIfNull(onError);
+        // public TNextValue Match<TNextValue>(
+        // Func<TValue, TNextValue> onValue,
+        // Func<List<Error>, TNextValue> onError)
+        // {
+        //     ArgumentNullException.ThrowIfNull(onValue);
+        //     ArgumentNullException.ThrowIfNull(onError);
 
-            return IsSuccess
-                ? onValue(_value)
-                : onError(_errors);
-        }
+        //     return IsSuccess
+        //         ? onValue(_value)
+        //         : onError(_errors);
+        // }
 
 
 
