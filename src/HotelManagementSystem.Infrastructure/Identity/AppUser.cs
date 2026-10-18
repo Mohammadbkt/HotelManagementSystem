@@ -30,5 +30,5 @@ namespace HotelManagementSystem.Infrastructure.Identity
             DeletedAt = null;
             DeletedBy = null;
         }
-    };
+    }
 }

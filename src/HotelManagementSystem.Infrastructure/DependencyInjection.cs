@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Infrastructure.Data;
+using HotelManagementSystem.Infrastructure.Email;
 using HotelManagementSystem.Infrastructure.Identity;
 using HotelManagementSystem.Infrastructure.Interceptors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Resend;
 
 namespace HotelManagementSystem.Infrastructure;
 
@@ -47,10 +49,13 @@ public static class DependencyInjection
         .AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<AppDbContext>();
 
+       
+
         services.AddScoped<ICurrentUserService, CurrentUser>();
         services.AddScoped<IIdentityService, IdentityServices>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IAccessTokenGenerator, JwtService>();
+        services.AddScoped<IEmailSender, ResendEmailSender>();
 
         // Registers the scheme only; the settings come from the Configure<> block below.
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -61,7 +66,7 @@ public static class DependencyInjection
             {
                 var o = jwt.Value;
 
-                bearer.MapInboundClaims = false;   // keep "sub" as "sub"
+                bearer.MapInboundClaims = false;
                 bearer.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -81,6 +86,19 @@ public static class DependencyInjection
                 };
             });
 
+
+        services.AddOptions<ResendOptions>()
+            .BindConfiguration(ResendOptions.SectionName)
+            .Validate(
+                options => !string.IsNullOrWhiteSpace(options.ApiKey),
+                "Resend API key is required.")
+            .Validate(
+                options => !string.IsNullOrWhiteSpace(options.FromEmail),
+                "Resend sender email is required.")
+            .ValidateOnStart();
+
+        services.AddResend(
+            configuration[$"{ResendOptions.SectionName}:ApiKey"] ?? string.Empty);
 
         services.AddScoped<AppDbContextInitializer>();
 

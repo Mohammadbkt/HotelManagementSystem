@@ -99,6 +99,7 @@ public sealed class IdentityServices(
             EmailConfirmed = false
         };
 
+
         var createResult = await _userManager.CreateAsync(user, password);
         if (!createResult.Succeeded)
         {
@@ -127,7 +128,14 @@ public sealed class IdentityServices(
                 .Select(e => Error.Validation(e.Code, e.Description))
                 .ToList();
 
-            await _userManager.DeleteAsync(user);
+            var deleteResult = await _userManager.DeleteAsync(user);
+            if (!deleteResult.Succeeded)
+            {
+                _logger.LogCritical(
+                    "Failed to roll back user {UserId} after role assignment failed. Errors: {Errors}.",
+                    user.Id,
+                    string.Join("; ", deleteResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
+            }
 
             return Result<AppUserDto>.Failure(errors);
         }
