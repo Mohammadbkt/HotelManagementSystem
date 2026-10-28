@@ -20,7 +20,7 @@ public sealed class RoomCategoryConfiguration : IEntityTypeConfiguration<RoomCat
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(rc => rc.Name)
-            .HasMaxLength(20);
+            .HasMaxLength(200);
 
         builder.Property(rc => rc.Description)
             .HasMaxLength(200);

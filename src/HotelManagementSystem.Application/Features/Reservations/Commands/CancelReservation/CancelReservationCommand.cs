@@ -4,6 +4,7 @@ using MediatR;
 namespace HotelManagementSystem.Application.Features.Reservations.Commands.CancelReservation
 {
     public sealed record CancelReservationCommand(
-        Guid ReservationId
+        Guid ReservationId,
+        string? Reason
     ) : IRequest<Result>;
 }

@@ -8,6 +8,7 @@ namespace HotelManagementSystem.Application.Features.Reservations.Dtos
 {
     public sealed record ReservationDto(
         Guid ReservationId,
+        Guid HotelId,
         Guid RoomId,
         ReservationStatus ReservationStatus,
         DateOnly CheckInDate,

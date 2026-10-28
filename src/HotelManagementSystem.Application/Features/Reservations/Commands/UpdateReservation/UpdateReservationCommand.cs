@@ -5,8 +5,11 @@ namespace HotelManagementSystem.Application.Features.Reservations.Commands.Updat
 {
     public sealed record UpdateReservationCommand(
         Guid ReservationId,
-        Guid RoomId,
+        Guid RoomCategoryId,
         DateOnly CheckInDate,
-        DateOnly CheckOutDate
+        DateOnly CheckOutDate,
+         int NumberOfAdults,
+       int NumberOfChildren,
+       string? SpecialRequests
     ) : IRequest<Result>;
 }

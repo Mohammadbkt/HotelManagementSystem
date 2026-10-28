@@ -111,10 +111,10 @@ public sealed class ReservationsController(ISender sender) : ApiController
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Cancel([FromRoute] Guid id, [FromBody] string reason, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new CancelReservationCommand(id), cancellationToken);
-       
+        var result = await _sender.Send(new CancelReservationCommand(id, reason), cancellationToken);
+
         if (result.IsSuccess)
             return NoContent();
         else

@@ -9,7 +9,8 @@ namespace HotelManagementSystem.Application.Features.Reservations.Mappers
         public static Expression<Func<Reservation, ReservationDto>> ProjectionExpression =
         r => new ReservationDto(
             r.Id,
-            r.RoomId,
+            r.HotelId,
+            r.RoomId ?? Guid.Empty,
             r.Status,
             r.CheckInDate,
             r.CheckOutDate

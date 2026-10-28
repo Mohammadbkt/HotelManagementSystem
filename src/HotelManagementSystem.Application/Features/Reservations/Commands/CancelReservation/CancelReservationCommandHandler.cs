@@ -39,7 +39,7 @@ namespace HotelManagementSystem.Application.Features.Reservations.Commands.Cance
                 return Result.Failure(ApplicationErrors.Reservation.NotFound);
             }
 
-            var result = reservation.Cancel();
+            var result = reservation.Cancel(DateTimeOffset.UtcNow, request.Reason);
             if (result.IsError)
             {
                 _logger.LogWarning("Failed to cancel reservation {ReservationId}: {Errors}",

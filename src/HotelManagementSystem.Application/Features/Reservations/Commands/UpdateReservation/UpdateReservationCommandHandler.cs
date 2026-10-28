@@ -4,6 +4,7 @@ using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Rooms;
 using HotelManagementSystem.Domain.Services;
+using HotelManagementSystem.Domain.ValueObjects.Money;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -44,32 +45,49 @@ namespace HotelManagementSystem.Application.Features.Reservations.Commands.Updat
                 return Result.Failure(ApplicationErrors.Reservation.NotFound);
             }
 
-            var room = await _context.Rooms.FindAsync([request.RoomId], cancellationToken);
-            if (room is null)
+            var roomCategory = await _context.RoomCategories.FindAsync([request.RoomCategoryId], cancellationToken);
+            if (roomCategory is null)
             {
-                _logger.LogInformation("");
-                return Result.Failure(ApplicationErrors.Room.NotFound);
+                _logger.LogInformation(
+                    "Room category {RoomCategoryId} not found for reservation update {ReservationId}",
+                    request.RoomCategoryId, request.ReservationId);
+                return Result.Failure(ApplicationErrors.RoomCategory.NotFound);
             }
+
+            var roomCount = await _context.Rooms
+                .CountAsync(r => r.RoomCategoryId == request.RoomCategoryId, cancellationToken);
+            if (roomCount == 0)
+                return Result.Failure(ApplicationErrors.RoomCategory.NotFound);
+
             var overlapping = await _context.Reservations
-                   .AsNoTracking()
-                   .Where(r => r.RoomId == request.RoomId
-                               && r.Id != request.ReservationId
-                               && request.CheckInDate < r.CheckOutDate
-                               && r.CheckInDate < request.CheckOutDate)
-                   .ToListAsync(cancellationToken);
+                .AsNoTracking()
+                .Where(r => r.Id != request.ReservationId
+                    && r.RoomCategoryId == request.RoomCategoryId
+                    && request.CheckInDate < r.CheckOutDate
+                    && r.CheckInDate < request.CheckOutDate)
+                .ToListAsync(cancellationToken);
 
-
-            var availabilityResult = ReservationAvailabilityService.EnsureNoOverlap(
-                overlapping, request.CheckInDate, request.CheckOutDate);
-
-            if (availabilityResult.IsError)
+            var availability = ReservationAvailabilityService.EnsureAvailability(
+                overlapping, request.CheckInDate, request.CheckOutDate, roomCount);
+            if (availability.IsError)
             {
-                _logger.LogWarning("Update of reservation {ReservationId} rejected: {Errors}",
-                                    request.ReservationId, availabilityResult.Errors);
-                return Result.Failure(availabilityResult.Errors);
+                _logger.LogWarning(
+                    "Update of reservation {ReservationId} rejected: {Errors}",
+                    request.ReservationId, availability.Errors);
+                return Result.Failure(availability.Errors);
             }
 
-            var result = reservation.Update(request.RoomId, request.CheckInDate, request.CheckOutDate);
+            var nights = request.CheckOutDate.DayNumber - request.CheckInDate.DayNumber;
+
+            var totalAmountResult = roomCategory.BasePricePerNight.Multiply(nights);
+            if (totalAmountResult.IsError)
+            {
+                return Result.Failure(totalAmountResult.Errors);
+            }
+
+
+
+            var result = reservation.Update(request.RoomCategoryId, request.CheckInDate, request.CheckOutDate, request.NumberOfAdults, request.NumberOfChildren, request.SpecialRequests, roomCategory.BasePricePerNight, totalAmountResult.Value);
             if (result.IsError)
             {
                 _logger.LogWarning("Failed to update reservation {ReservationId}: {Errors}",

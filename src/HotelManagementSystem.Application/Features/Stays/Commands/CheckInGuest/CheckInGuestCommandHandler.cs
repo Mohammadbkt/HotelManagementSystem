@@ -8,16 +8,25 @@ using Microsoft.EntityFrameworkCore;
 using MediatR;
 using HotelManagementSystem.Application.Common.Errors;
 using Microsoft.Extensions.Logging;
+using HotelManagementSystem.Application.Common;
+using HotelManagementSystem.Domain.Entities.Reservations;
 
 namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
 {
-    public sealed class CheckInGuestCommandHandler(IAppDbContext context, ILogger<CheckInGuestCommandHandler> logger) : IRequestHandler<CheckInGuestCommand, Result<Guid>>
+    public sealed class CheckInGuestCommandHandler(
+        IAppDbContext context,
+        ICurrentUserService currentUser,
+        ILogger<CheckInGuestCommandHandler> logger) : IRequestHandler<CheckInGuestCommand, Result<Guid>>
     {
         private readonly IAppDbContext _context = context;
+        private readonly ICurrentUserService _currentUser = currentUser;
         private readonly ILogger<CheckInGuestCommandHandler> _logger = logger;
 
         public async Task<Result<Guid>> Handle(CheckInGuestCommand request, CancellationToken cancellationToken)
         {
+            if (_currentUser.UserId is null || !Roles.IsStaff(_currentUser.Roles))
+                return Result<Guid>.Failure(ApplicationErrors.Authorization.Forbidden);
+
             if (request.ReservationId is not null)
                 return await CheckInWithReservation(request, cancellationToken);
 
@@ -31,6 +40,14 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
             {
                 _logger.LogWarning("Reservation {ReservationId} not found during check-in", request.ReservationId);
                 return Result<Guid>.Failure(ApplicationErrors.Reservation.NotFound);
+            }
+
+            if (reservation.RoomId is null)
+            {
+                _logger.LogWarning(
+                    "Reservation {ReservationId} has no assigned room; cannot check in",
+                    request.ReservationId);
+                return Result<Guid>.Failure(ApplicationErrors.Reservation.RoomNotAssigned);
             }
 
             var guest = await _context.Guests.FindAsync([reservation.GuestId], cancellationToken);
@@ -47,7 +64,7 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
                 return Result<Guid>.Failure(ApplicationErrors.Room.NotFound);
             }
 
-            var stayResult = Stay.CreateFromReservation(reservation, DateTimeOffset.UtcNow);
+            var stayResult = Stay.CreateFromReservation(reservation, room.Id, DateTimeOffset.UtcNow);
             if (stayResult.IsError)
             {
                 _logger.LogWarning("Failed to create stay from reservation {ReservationId}: {Errors}", request.ReservationId, stayResult.Errors);
@@ -79,6 +96,9 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
 
         private async Task<Result<Guid>> CheckInWalkIn(CheckInGuestCommand request, CancellationToken cancellationToken)
         {
+            if (request.ExpectedCheckOutDate is null)
+                return Result<Guid>.Failure(ApplicationErrors.Reservation.InvalidCheckOutDate);
+
             var guest = await _context.Guests.FindAsync([request.GuestId], cancellationToken);
             if (guest is null)
             {
@@ -93,11 +113,19 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
                 return Result<Guid>.Failure(ApplicationErrors.Room.NotFound);
             }
 
-            var stayResult = Stay.Create(request.GuestId, request.RoomId, DateTimeOffset.UtcNow);
-            if (stayResult.IsError)
+            var hotel = await _context.Hotels.FindAsync([request.HotelId], cancellationToken);
+            if (hotel is null)
             {
-                _logger.LogWarning("Failed to create walk-in stay for guest {GuestId}: {Errors}", request.GuestId, stayResult.Errors);
-                return Result<Guid>.Failure(stayResult.Errors);
+                _logger.LogWarning("Hotel {HotelId} not found during walk-in check-in", request.HotelId);
+                return Result<Guid>.Failure(ApplicationErrors.Hotel.NotFound);
+            }
+
+            if (room.HotelId != hotel.Id)
+            {
+                _logger.LogWarning(
+                    "Room {RoomId} does not belong to hotel {HotelId}",
+                    request.RoomId, request.HotelId);
+                return Result<Guid>.Failure(ApplicationErrors.Room.NotFound);
             }
 
             if (room.Status != RoomStatus.CleanVacant)
@@ -106,18 +134,62 @@ namespace HotelManagementSystem.Application.Features.Stays.Commands.CheckInGuest
                 return Result<Guid>.Failure(RoomErrors.RoomNotAvailable);
             }
 
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var now = DateTimeOffset.UtcNow;
+            var today = DateOnly.FromDateTime(now.UtcDateTime);
+            var checkOut = request.ExpectedCheckOutDate.Value;
 
-            var reservations = await _context.Reservations
-                .Where(r => r.RoomId == request.RoomId && r.CheckOutDate > today)
-                .ToListAsync(cancellationToken);
+            if (checkOut <= today)
+            {
+                _logger.LogWarning(
+                    "Walk-in check-in has invalid check-out date {CheckOut}", checkOut);
+                return Result<Guid>.Failure(ApplicationErrors.Reservation.InvalidCheckOutDate);
+            }
 
-            var availability = ReservationAvailabilityService.EnsureNoOverlap(
-                reservations, today, request.ExpectedCheckOutDate!.Value);
+            var overlapping = await _context.Reservations
+                        .AsNoTracking()
+                        .Where(r => r.RoomCategoryId == room.RoomCategoryId
+                                    && today < r.CheckOutDate
+                                    && r.CheckInDate < checkOut)
+                        .ToListAsync(cancellationToken);
+
+
+            var roomAlreadyReserved = overlapping.Any(r =>
+                r.RoomId == room.Id
+                && (r.Status == ReservationStatus.Pending
+                    || r.Status == ReservationStatus.Confirmed
+                    || r.Status == ReservationStatus.CheckedIn));
+
+            if (roomAlreadyReserved)
+            {
+                _logger.LogWarning(
+                    "Walk-in rejected: room {RoomId} already has an overlapping reservation",
+                    request.RoomId);
+                return Result<Guid>.Failure(ReservationErrors.RoomAlreadyBooked);
+            }
+
+            var roomCount = await _context.Rooms
+                           .CountAsync(r => r.RoomCategoryId == room.RoomCategoryId, cancellationToken);
+            if (roomCount == 0)
+            {
+                _logger.LogWarning(
+                    "Room category {RoomCategoryId} has no rooms",
+                    room.RoomCategoryId);
+                return Result<Guid>.Failure(ApplicationErrors.RoomCategory.NotFound);
+            }
+
+            var availability = ReservationAvailabilityService.EnsureAvailability(
+                overlapping, today, request.ExpectedCheckOutDate!.Value, roomCount);
             if (availability.IsError)
             {
                 _logger.LogWarning("Walk-in check-in for guest {GuestId} room {RoomId} failed availability check: {Errors}", request.GuestId, request.RoomId, availability.Errors);
                 return Result<Guid>.Failure(availability.Errors);
+            }
+
+            var stayResult = Stay.Create(request.GuestId, request.RoomId, request.HotelId, DateTimeOffset.UtcNow);
+            if (stayResult.IsError)
+            {
+                _logger.LogWarning("Failed to create walk-in stay for guest {GuestId}: {Errors}", request.GuestId, stayResult.Errors);
+                return Result<Guid>.Failure(stayResult.Errors);
             }
 
             var roomResult = room.CheckIn();

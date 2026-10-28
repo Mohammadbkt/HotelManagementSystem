@@ -8,6 +8,10 @@ namespace HotelManagementSystem.Domain.Entities.Stays
             Error.Validation(
                 "Stay.InvalidGuestId",
                 "Invalid guest ID.");
+        public static Error InvalidHotelId =>
+            Error.Validation(
+                "Stay.InvalidHotelId",
+                "Invalid hotel ID.");
 
         public static Error InvalidRoomId =>
             Error.Validation(

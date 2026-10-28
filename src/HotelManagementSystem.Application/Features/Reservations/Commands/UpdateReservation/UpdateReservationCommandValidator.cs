@@ -10,10 +10,7 @@ namespace HotelManagementSystem.Application.Features.Reservations.Commands.Updat
                 .NotEmpty()
                 .WithMessage("Reservation ID is required.");
 
-            RuleFor(x => x.RoomId)
-                .NotEmpty()
-                .WithMessage("Room ID is required.");
-
+           
             RuleFor(x => x.CheckInDate)
                 .NotEmpty()
                 .WithMessage("Check-in date is required.")
