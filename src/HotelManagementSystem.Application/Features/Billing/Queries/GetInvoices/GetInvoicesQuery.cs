@@ -8,7 +8,6 @@ namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoices
 {
     public sealed record GetInvoicesQuery(
         Guid? HotelId = null,
-        Guid? GuestId = null,
         Guid? StayId = null,
         // string? SearchTerm = null,
         SortDirection SortDirection = SortDirection.Ascending,

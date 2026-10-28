@@ -4,9 +4,13 @@ namespace HotelManagementSystem.Domain.Entities.Billing;
 
 public static class InvoiceErrors
 {
+
     public static readonly Error InvalidStayId = Error.Validation(
         "Invoice.StayId.Invalid",
         "StayId is invalid");
+    public static readonly Error InvalidInvoiceNumber = Error.Validation(
+        "Invoice.InvalidInvoiceNumber",
+        "Invalid invoice number");
 
     public static readonly Error InvalidGuestId = Error.Validation(
         "Invoice.GuestId.Invalid",

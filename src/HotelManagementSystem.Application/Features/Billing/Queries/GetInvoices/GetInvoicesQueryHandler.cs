@@ -21,9 +21,6 @@ namespace HotelManagementSystem.Application.Features.Billing.Queries.GetInvoices
                         .AsNoTracking()
                         .AsQueryable();
 
-            if(request.GuestId.HasValue)
-                query = query.Where(i => i.GuestId == request.GuestId);
-
             if(request.StayId.HasValue)
                 query = query.Where(i => i.StayId == request.StayId);
 

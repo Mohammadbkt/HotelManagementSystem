@@ -17,7 +17,6 @@ public static class InvoiceGenerationService
 
         var invoiceResult = Invoice.Create(
             stay.Id,
-            stay.GuestId,
             category.BasePricePerNight.Currency);
 
         if (invoiceResult.IsError)

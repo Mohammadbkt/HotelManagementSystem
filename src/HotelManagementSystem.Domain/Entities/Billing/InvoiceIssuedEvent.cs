@@ -9,13 +9,11 @@ namespace HotelManagementSystem.Domain.Entities.Billing
     public sealed class InvoiceIssuedEvent: DomainEvent
     {
         public Guid InvoiceId { get; }
-        public Guid GuestId { get; }
         public DateTimeOffset IssuedAt { get; }
 
-        public InvoiceIssuedEvent(Guid invoiceId, Guid guestId, DateTimeOffset issuedAt)
+        public InvoiceIssuedEvent(Guid invoiceId, DateTimeOffset issuedAt)
         {
             InvoiceId = invoiceId;
-            GuestId = guestId;
             IssuedAt = issuedAt;
         }
     }

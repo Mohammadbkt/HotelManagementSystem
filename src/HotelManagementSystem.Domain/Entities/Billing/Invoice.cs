@@ -1,6 +1,7 @@
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Billing.Payments;
+using HotelManagementSystem.Domain.Entities.Stays;
 using HotelManagementSystem.Domain.ValueObjects.Money;
 
 namespace HotelManagementSystem.Domain.Entities.Billing;
@@ -13,7 +14,7 @@ public sealed class Invoice : AuditableEntity
         => _lineItems.AsReadOnly();
 
     public Guid StayId { get; private set; }
-    public Guid GuestId { get; private set; }
+    public string? Number { get; private set; }
 
     public DateTimeOffset? IssuedAt { get; private set; }
     public DateTimeOffset? PaidAt { get; private set; }
@@ -26,6 +27,7 @@ public sealed class Invoice : AuditableEntity
     public Money TotalAmount { get; private set; }
 
     public Payment? Payment { get; private set; }
+    public Stay? Stay { get; private set; }
 
     // EF Core
     private Invoice()
@@ -35,13 +37,10 @@ public sealed class Invoice : AuditableEntity
     private Invoice(
         Guid id,
         Guid stayId,
-        Guid guestId,
         string currencyCode)
         : base(id)
     {
         StayId = stayId;
-        GuestId = guestId;
-
         Status = InvoiceStatus.Draft;
 
         SubTotal = Money.Zero(currencyCode);
@@ -50,16 +49,10 @@ public sealed class Invoice : AuditableEntity
         TotalAmount = Money.Zero(currencyCode);
     }
 
-    public static Result<Invoice> Create(
-        Guid stayId,
-        Guid guestId,
-        string currencyCode = "JOD")
+    public static Result<Invoice> Create(Guid stayId, string currencyCode = "JOD")
     {
         if (stayId == Guid.Empty)
             return Result<Invoice>.Failure(InvoiceErrors.InvalidStayId);
-
-        if (guestId == Guid.Empty)
-            return Result<Invoice>.Failure(InvoiceErrors.InvalidGuestId);
 
         if (string.IsNullOrWhiteSpace(currencyCode))
             return Result<Invoice>.Failure(MoneyErrors.CurrencyRequired);
@@ -67,7 +60,6 @@ public sealed class Invoice : AuditableEntity
         return Result<Invoice>.Success(new Invoice(
             Guid.NewGuid(),
             stayId,
-            guestId,
             currencyCode));
     }
 
@@ -101,10 +93,13 @@ public sealed class Invoice : AuditableEntity
         return Result.Success();
     }
 
-    public Result Issue(DateTimeOffset issuedAt)
+    public Result Issue(string invoiceNumber, DateTimeOffset issuedAt)
     {
         if (Status != InvoiceStatus.Draft)
             return Result.Failure(InvoiceErrors.CannotIssue);
+
+        if (string.IsNullOrWhiteSpace(invoiceNumber))
+            return Result.Failure(InvoiceErrors.InvalidInvoiceNumber);
 
         if (issuedAt == default)
             return Result.Failure(InvoiceErrors.InvalidIssuedAt);
@@ -112,10 +107,12 @@ public sealed class Invoice : AuditableEntity
         if (_lineItems.Count == 0)
             return Result.Failure(InvoiceErrors.EmptyInvoice);
 
+
+        Number = invoiceNumber.Trim();
         IssuedAt = issuedAt;
         Status = InvoiceStatus.Issued;
 
-        AddDomainEvent(new InvoiceIssuedEvent(Id, GuestId, issuedAt));
+        AddDomainEvent(new InvoiceIssuedEvent(Id, issuedAt));
 
 
         return Result.Success();
@@ -140,7 +137,6 @@ public sealed class Invoice : AuditableEntity
 
         var paymentResult = Payment.CreateCashPayment(
             Id,
-            GuestId,
             TotalAmount,
             paidAt);
 

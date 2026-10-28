@@ -5,7 +5,6 @@ namespace HotelManagementSystem.Application.Features.Billing.Dtos
     public sealed record InvoiceDto(
         Guid Id,
         Guid StayId,
-        Guid GuestId,
         // string GuestName,
         DateTimeOffset? IssuedAt,
         DateTimeOffset? PaidAt,

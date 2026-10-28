@@ -26,13 +26,6 @@ public sealed class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.ComplexProperty(p => p.Amount,
             m => m.ConfigureMoney("Amount", "Currency"));
 
-
-        builder.HasOne<Guest>()
-            .WithMany()
-            .HasForeignKey(p => p.GuestId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasIndex(p => p.GuestId);
         builder.HasIndex(p => p.PaymentDate);
 
         builder.Ignore(p => p.DomainEvents);

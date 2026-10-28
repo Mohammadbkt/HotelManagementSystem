@@ -10,7 +10,6 @@ namespace HotelManagementSystem.Application.Features.Billing.Mappers
             i => new InvoiceDto(
                 i.Id,
                 i.StayId,
-                i.GuestId,
                 i.IssuedAt,
                 i.PaidAt,
                 i.Status,
@@ -24,7 +23,7 @@ namespace HotelManagementSystem.Application.Features.Billing.Mappers
                     : new PaymentDto(
                         i.Payment.Id,
                         i.Payment.InvoiceId,
-                        i.Payment.GuestId,
+                        i.Stay!.GuestId,
                         i.Payment.Amount.Amount,
                         i.Payment.Amount.Currency,
                         i.Payment.Method,

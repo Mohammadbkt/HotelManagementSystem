@@ -13,11 +13,6 @@ public sealed class GetInvoicesQueryValidator
             .When(x => x.HotelId.HasValue)
             .WithMessage("HotelId cannot be an empty GUID.");
 
-        RuleFor(x => x.GuestId)
-            .NotEqual(Guid.Empty)
-            .When(x => x.GuestId.HasValue)
-            .WithMessage("GuestId cannot be an empty GUID.");
-
         RuleFor(x => x.StayId)
             .NotEqual(Guid.Empty)
             .When(x => x.StayId.HasValue)

@@ -20,7 +20,7 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.IssueInvoi
 
                 return Result.Failure(ApplicationErrors.Invoice.NotFound);
             }
-            var invoiceResult = invoice.Issue(DateTimeOffset.UtcNow);
+            var invoiceResult = invoice.Issue(invoice.Number!, DateTimeOffset.UtcNow);
             if (invoiceResult.IsError)
             {
                 _logger.LogWarning(

@@ -1,6 +1,7 @@
 using HotelManagementSystem.Domain.Entities.Billing;
 using HotelManagementSystem.Domain.Entities.Billing.Payments;
 using HotelManagementSystem.Domain.Entities.Guests;
+using HotelManagementSystem.Domain.Entities.Hotels;
 using HotelManagementSystem.Domain.Entities.Stays;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -49,18 +50,12 @@ public sealed class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             .HasForeignKey<Payment>(p => p.InvoiceId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<Stay>()
-            .WithMany()
-            .HasForeignKey(i => i.StayId)
+        builder.HasOne(i => i.Stay)
+            .WithOne()
+            .HasForeignKey<Invoice>(i => i.StayId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<Guest>()
-            .WithMany()
-            .HasForeignKey(i => i.GuestId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasIndex(i => i.StayId);
-        builder.HasIndex(i => i.GuestId);
+        builder.HasIndex(i => i.StayId).IsUnique(true);
         builder.HasIndex(i => i.Status);
 
         builder.Ignore(i => i.DomainEvents);

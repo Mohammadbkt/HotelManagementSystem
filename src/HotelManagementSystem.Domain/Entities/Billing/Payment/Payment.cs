@@ -7,7 +7,6 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
     public sealed class Payment : AuditableEntity
     {
         public Guid InvoiceId { get; private set; }
-        public Guid GuestId { get; private set; }
         //public Guid ReceivedByUserId { get; private set; }
 
         public Money Amount { get; private set; }
@@ -23,14 +22,12 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
         private Payment(
             Guid id,
             Guid invoiceId,
-            Guid guestId,
             Money amount,
             DateTimeOffset paymentDate,
             string? notes)
             : base(id)
         {
             InvoiceId = invoiceId;
-            GuestId = guestId;
             Amount = amount;
             Method = PaymentMethods.Cash;
             PaymentDate = paymentDate;
@@ -39,16 +36,12 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
 
         public static Result<Payment> CreateCashPayment(
             Guid invoiceId,
-            Guid guestId,
             Money amount,
             DateTimeOffset paymentDate,
             string? notes = null)
         {
             if (invoiceId == Guid.Empty)
                 return Result<Payment>.Failure(PaymentErrors.InvalidInvoiceId);
-
-            if (guestId == Guid.Empty)
-                return Result<Payment>.Failure(PaymentErrors.InvalidGuestId);
 
             if (amount.Amount <= 0)
                 return Result<Payment>.Failure(PaymentErrors.InvalidAmount);
@@ -59,7 +52,6 @@ namespace HotelManagementSystem.Domain.Entities.Billing.Payments
             return Result<Payment>.Success(new Payment(
                 Guid.NewGuid(),
                 invoiceId,
-                guestId,
                 amount,
                 paymentDate,
                 notes));
