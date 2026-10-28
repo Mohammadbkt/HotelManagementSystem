@@ -32,7 +32,7 @@ namespace HotelManagementSystem.Infrastructure.Data.Configurations
             builder.HasOne<AppUser>()
             .WithOne()
             .HasForeignKey<Employee>(e => e.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(x => x.Role)
             .IsRequired()

@@ -23,7 +23,7 @@ namespace HotelManagementSystem.Infrastructure.Email
                 From = _options.Value.FromEmail,
                 To = recipient.Value,
                 Subject = subject,
-                TextBody = body
+                HtmlBody = body
             }, cancellationToken);
 
             if (!response.Success)

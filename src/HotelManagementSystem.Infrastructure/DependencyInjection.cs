@@ -47,17 +47,19 @@ public static class DependencyInjection
             options.SignIn.RequireConfirmedEmail = true;
         })
         .AddRoles<IdentityRole<Guid>>()
+        .AddDefaultTokenProviders()
         .AddEntityFrameworkStores<AppDbContext>();
 
-       
+
 
         services.AddScoped<ICurrentUserService, CurrentUser>();
-        services.AddScoped<IIdentityService, IdentityServices>();
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IAccessTokenGenerator, JwtService>();
-        services.AddScoped<IEmailSender, ResendEmailSender>();
+        services.AddScoped<IAuthService, AuthService>();
 
-        // Registers the scheme only; the settings come from the Configure<> block below.
+        //services.AddScoped<IEmailSender, ResendEmailSender>();
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer();
 
@@ -95,10 +97,20 @@ public static class DependencyInjection
             .Validate(
                 options => !string.IsNullOrWhiteSpace(options.FromEmail),
                 "Resend sender email is required.")
+                .Validate(o => o.ConfirmationUrlFormat.Contains("{token}") && o.ConfirmationUrlFormat.Contains("{email}"),
+          "Resend:ConfirmationUrlFormat must contain {email} and {token}.")
+            .Validate(o => o.PasswordResetUrlFormat.Contains("{token}") && o.PasswordResetUrlFormat.Contains("{email}"),
+                      "Resend:PasswordResetUrlFormat must contain {email} and {token}.")
             .ValidateOnStart();
 
         services.AddResend(
             configuration[$"{ResendOptions.SectionName}:ApiKey"] ?? string.Empty);
+
+        services.Configure<GmailEmailOptions>(configuration.GetSection(GmailEmailOptions.SectionName));
+
+        services.AddScoped<IEmailSender, GmailSmtpEmailSender>();
+
+        services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromDays(3));
 
         services.AddScoped<AppDbContextInitializer>();
 

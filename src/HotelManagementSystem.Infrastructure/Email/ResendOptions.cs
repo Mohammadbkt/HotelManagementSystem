@@ -7,4 +7,9 @@ public sealed class ResendOptions
     public string ApiKey { get; init; } = string.Empty;
 
     public string FromEmail { get; init; } = "onboarding@resend.dev";
+
+    public string ConfirmationUrlFormat { get; init; } = string.Empty;
+    
+    public string PasswordResetUrlFormat { get; init; } = string.Empty;
+    
 }
