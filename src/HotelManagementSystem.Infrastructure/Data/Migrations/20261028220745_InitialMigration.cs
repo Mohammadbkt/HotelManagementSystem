@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HotelManagementSystem.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -84,7 +84,7 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     HotelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     MaxCapacity = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -164,7 +164,7 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -202,13 +202,13 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Token = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    TokenHash = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExpiresOnUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DeviceName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     IpAddress = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: true),
                     RevokedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    ReplacedByToken = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ReplacedByTokenHash = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     LastModifiedUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -351,10 +351,20 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     GuestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoomCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    HotelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReservationNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     CheckInDate = table.Column<DateOnly>(type: "date", nullable: false),
                     CheckOutDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    NumberOfAdults = table.Column<int>(type: "int", nullable: false),
+                    NumberOfChildren = table.Column<int>(type: "int", nullable: false),
+                    CancelledAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CancellationReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SpecialRequests = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Currency = table.Column<string>(type: "nchar(3)", fixedLength: true, maxLength: 3, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     LastModifiedUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -367,6 +377,18 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                         name: "FK_Reservations_Guests_GuestId",
                         column: x => x.GuestId,
                         principalTable: "Guests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Reservations_Hotels_HotelId",
+                        column: x => x.HotelId,
+                        principalTable: "Hotels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Reservations_RoomCategories_RoomCategoryId",
+                        column: x => x.RoomCategoryId,
+                        principalTable: "RoomCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -385,6 +407,7 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     GuestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReservationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    HotelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CheckInDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     CheckOutDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -399,6 +422,12 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                         name: "FK_Stays_Guests_GuestId",
                         column: x => x.GuestId,
                         principalTable: "Guests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Stays_Hotels_HotelId",
+                        column: x => x.HotelId,
+                        principalTable: "Hotels",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -421,7 +450,7 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StayId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GuestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IssuedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     PaidAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -441,12 +470,6 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Invoices", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Invoices_Guests_GuestId",
-                        column: x => x.GuestId,
-                        principalTable: "Guests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Invoices_Stays_StayId",
                         column: x => x.StayId,
@@ -486,7 +509,6 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     InvoiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GuestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Method = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     PaymentDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
@@ -500,12 +522,6 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Payments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Payments_Guests_GuestId",
-                        column: x => x.GuestId,
-                        principalTable: "Guests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Payments_Invoices_InvoiceId",
                         column: x => x.InvoiceId,
@@ -539,11 +555,6 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Invoices_GuestId",
-                table: "Invoices",
-                column: "GuestId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Invoices_Status",
                 table: "Invoices",
                 column: "Status");
@@ -551,12 +562,8 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Invoices_StayId",
                 table: "Invoices",
-                column: "StayId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Payments_GuestId",
-                table: "Payments",
-                column: "GuestId");
+                column: "StayId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_InvoiceId",
@@ -570,9 +577,9 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 column: "PaymentDate");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefreshTokens_Token",
+                name: "IX_RefreshTokens_TokenHash",
                 table: "RefreshTokens",
-                column: "Token",
+                column: "TokenHash",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -584,6 +591,16 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 name: "IX_Reservations_GuestId",
                 table: "Reservations",
                 column: "GuestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservations_HotelId",
+                table: "Reservations",
+                column: "HotelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservations_RoomCategoryId",
+                table: "Reservations",
+                column: "RoomCategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_RoomId",
@@ -638,6 +655,11 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 name: "IX_Stays_GuestId",
                 table: "Stays",
                 column: "GuestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stays_HotelId",
+                table: "Stays",
+                column: "HotelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stays_ReservationId",

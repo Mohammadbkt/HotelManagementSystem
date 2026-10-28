@@ -13,8 +13,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelManagementSystem.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261018204443_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20261028220745_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,9 +37,6 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("GuestId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTimeOffset?>("IssuedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -48,6 +45,9 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastModifiedUtc")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Number")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("PaidAt")
                         .HasColumnType("datetimeoffset");
@@ -130,11 +130,10 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GuestId");
-
                     b.HasIndex("Status");
 
-                    b.HasIndex("StayId");
+                    b.HasIndex("StayId")
+                        .IsUnique();
 
                     b.ToTable("Invoices", (string)null);
                 });
@@ -211,9 +210,6 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("GuestId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uniqueidentifier");
 
@@ -253,8 +249,6 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                         });
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GuestId");
 
                     b.HasIndex("InvoiceId")
                         .IsUnique();
@@ -515,14 +509,14 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset?>("LastModifiedUtc")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("ReplacedByToken")
+                    b.Property<string>("ReplacedByTokenHash")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<DateTimeOffset?>("RevokedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Token")
+                    b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -532,7 +526,7 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Token")
+                    b.HasIndex("TokenHash")
                         .IsUnique();
 
                     b.HasIndex("UserId");
@@ -544,6 +538,12 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CancellationReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateOnly>("CheckInDate")
                         .HasColumnType("date");
@@ -560,23 +560,84 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.Property<Guid>("GuestId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("HotelId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset?>("LastModifiedUtc")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int>("NumberOfAdults")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfChildren")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReservationNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RoomCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("RoomId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SpecialRequests")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "BasePricePerNight", "HotelManagementSystem.Domain.Entities.Reservations.Reservation.BasePricePerNight#Money", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<decimal>("Amount")
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)")
+                                .HasColumnName("Amount");
+
+                            b1.Property<string>("Currency")
+                                .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasMaxLength(3)
+                                .HasColumnType("nchar(3)")
+                                .HasColumnName("Currency")
+                                .IsFixedLength();
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "TotalAmount", "HotelManagementSystem.Domain.Entities.Reservations.Reservation.TotalAmount#Money", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<decimal>("Amount")
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)")
+                                .HasColumnName("Amount");
+
+                            b1.Property<string>("Currency")
+                                .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasMaxLength(3)
+                                .HasColumnType("nchar(3)")
+                                .HasColumnName("Currency")
+                                .IsFixedLength();
+                        });
+
                     b.HasKey("Id");
 
                     b.HasIndex("GuestId");
+
+                    b.HasIndex("HotelId");
+
+                    b.HasIndex("RoomCategoryId");
 
                     b.HasIndex("RoomId");
 
@@ -682,8 +743,8 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "BasePricePerNight", "HotelManagementSystem.Domain.Entities.Rooms.RoomCategories.RoomCategory.BasePricePerNight#Money", b1 =>
                         {
@@ -729,6 +790,9 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.Property<Guid>("GuestId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("HotelId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -746,6 +810,8 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.HasIndex("CheckInDate");
 
                     b.HasIndex("GuestId");
+
+                    b.HasIndex("HotelId");
 
                     b.HasIndex("ReservationId");
 
@@ -982,17 +1048,13 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("HotelManagementSystem.Domain.Entities.Billing.Invoice", b =>
                 {
-                    b.HasOne("HotelManagementSystem.Domain.Entities.Guests.Guest", null)
-                        .WithMany()
-                        .HasForeignKey("GuestId")
+                    b.HasOne("HotelManagementSystem.Domain.Entities.Stays.Stay", "Stay")
+                        .WithOne()
+                        .HasForeignKey("HotelManagementSystem.Domain.Entities.Billing.Invoice", "StayId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("HotelManagementSystem.Domain.Entities.Stays.Stay", null)
-                        .WithMany()
-                        .HasForeignKey("StayId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("Stay");
                 });
 
             modelBuilder.Entity("HotelManagementSystem.Domain.Entities.Billing.InvoiceLineItem", b =>
@@ -1006,12 +1068,6 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("HotelManagementSystem.Domain.Entities.Billing.Payments.Payment", b =>
                 {
-                    b.HasOne("HotelManagementSystem.Domain.Entities.Guests.Guest", null)
-                        .WithMany()
-                        .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("HotelManagementSystem.Domain.Entities.Billing.Invoice", null)
                         .WithOne("Payment")
                         .HasForeignKey("HotelManagementSystem.Domain.Entities.Billing.Payments.Payment", "InvoiceId")
@@ -1030,7 +1086,7 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.HasOne("HotelManagementSystem.Infrastructure.Identity.AppUser", null)
                         .WithOne()
                         .HasForeignKey("HotelManagementSystem.Domain.Entities.Employee.Employee", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -1056,6 +1112,18 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.HasOne("HotelManagementSystem.Domain.Entities.Guests.Guest", null)
                         .WithMany()
                         .HasForeignKey("GuestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HotelManagementSystem.Domain.Entities.Hotels.Hotel", null)
+                        .WithMany()
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HotelManagementSystem.Domain.Entities.Rooms.RoomCategories.RoomCategory", null)
+                        .WithMany()
+                        .HasForeignKey("RoomCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1095,6 +1163,12 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.HasOne("HotelManagementSystem.Domain.Entities.Guests.Guest", null)
                         .WithMany()
                         .HasForeignKey("GuestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HotelManagementSystem.Domain.Entities.Hotels.Hotel", null)
+                        .WithMany()
+                        .HasForeignKey("HotelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
