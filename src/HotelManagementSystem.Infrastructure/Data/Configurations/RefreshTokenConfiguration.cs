@@ -17,11 +17,11 @@ public sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<Refresh
             .IsRequired();
 
 
-        builder.Property(t => t.Token)
+        builder.Property(t => t.TokenHash)
             .IsRequired()
             .HasMaxLength(256);
 
-        builder.Property(t => t.ReplacedByToken)
+        builder.Property(t => t.ReplacedByTokenHash)
             .HasMaxLength(256);
 
         builder.Property(t => t.DeviceName)
@@ -44,7 +44,7 @@ public sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<Refresh
         builder.HasIndex(t => t.UserId);
 
 
-        builder.HasIndex(t => t.Token).IsUnique();
+        builder.HasIndex(t => t.TokenHash).IsUnique();
 
     }
 }

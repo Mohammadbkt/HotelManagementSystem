@@ -9,14 +9,14 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.RefreshTo
 
 public sealed class RefreshTokenCommandHandler(
     IAppDbContext context,
-    IIdentityService identityService,
+    IUserService userService,
     IAccessTokenGenerator jwtService,
     IRefreshTokenService refreshTokenService,
     ILogger<RefreshTokenCommandHandler> logger)
     : IRequestHandler<RefreshTokenCommand, Result<AuthResponseDto>>
 {
     private readonly IAppDbContext _context = context;
-    private readonly IIdentityService _identityService = identityService;
+    private readonly IUserService _userService = userService;
     private readonly IAccessTokenGenerator _jwtService = jwtService;
     private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
     private readonly ILogger<RefreshTokenCommandHandler> _logger = logger;
@@ -29,7 +29,7 @@ public sealed class RefreshTokenCommandHandler(
 
         var oldToken = await _context.RefreshTokens
             .FirstOrDefaultAsync(
-                x => x.Token == request.RefreshToken,
+                x => x.TokenHash == request.RefreshToken,
                 cancellationToken);
 
         if (oldToken is null || oldToken.ExpiresOnUtc <= now)
@@ -63,7 +63,7 @@ public sealed class RefreshTokenCommandHandler(
                     "The refresh token is invalid."));
         }
 
-        var userResult = await _identityService.GetUserByIdAsync(
+        var userResult = await _userService.GetUserByIdAsync(
             oldToken.UserId,
             cancellationToken);
 
@@ -85,7 +85,7 @@ public sealed class RefreshTokenCommandHandler(
                 accessTokenResult.Errors);
         }
 
-        var newRefreshTokenResult = _refreshTokenService.Create(user.Id, request.DeviceName, request.IpAddress);
+        var newRefreshTokenResult = await _refreshTokenService.CreateAsync(user.Id, request.DeviceName, request.IpAddress, cancellationToken);
 
         if (newRefreshTokenResult.IsError)
         {
@@ -96,16 +96,14 @@ public sealed class RefreshTokenCommandHandler(
         var accessToken = accessTokenResult.Value;
         var newRefreshToken = newRefreshTokenResult.Value;
 
-        oldToken.Revoke(now, newRefreshToken.Token);
-
-        await _context.RefreshTokens.AddAsync(newRefreshToken, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        oldToken.Revoke(now, newRefreshToken.RawToken);
 
         return Result<AuthResponseDto>.Success(
             new AuthResponseDto(
                 accessToken.Value,
-                newRefreshToken.Token,
+                newRefreshToken.RawToken,
                 accessToken.ExpiresAtUtc,
-                newRefreshToken.ExpiresOnUtc));
+                newRefreshToken.ExpiresOnUtc,
+                user));
     }
 }

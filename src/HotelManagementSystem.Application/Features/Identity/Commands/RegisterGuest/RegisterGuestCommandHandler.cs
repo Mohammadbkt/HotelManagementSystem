@@ -1,7 +1,7 @@
-
 using HotelManagementSystem.Application.Common;
 using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
+using HotelManagementSystem.Application.Common.Models;
 using HotelManagementSystem.Application.Features.Identity.Dtos;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Guests;
@@ -15,26 +15,22 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.RegisterG
 
 public sealed class RegisterGuestCommandHandler(
     IAppDbContext context,
-    IIdentityService identity,
-    IRefreshTokenService refreshTokenService,
-    IAccessTokenGenerator jwtService,
+    IUserService userService,
     ILogger<RegisterGuestCommandHandler> logger)
-    : IRequestHandler<RegisterGuestCommand, Result<AuthResponseDto>>
+    : IRequestHandler<RegisterGuestCommand, Result<RegisterGuestResponseDto>>
 {
     private readonly IAppDbContext _context = context;
-    private readonly IIdentityService _identity = identity;
-    private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
-    private readonly IAccessTokenGenerator _jwtService = jwtService;
+    private readonly IUserService _userService = userService;
     private readonly ILogger<RegisterGuestCommandHandler> _logger = logger;
 
-    public async Task<Result<AuthResponseDto>> Handle(
+    public async Task<Result<RegisterGuestResponseDto>> Handle(
         RegisterGuestCommand request,
         CancellationToken cancellationToken)
     {
         var emailResult = EmailAddress.Create(request.Email);
 
         if (emailResult.IsError)
-            return Result<AuthResponseDto>.Failure(emailResult.Errors);
+            return Result<RegisterGuestResponseDto>.Failure(emailResult.Errors);
 
         PhoneNumber? phone = null;
 
@@ -43,7 +39,7 @@ public sealed class RegisterGuestCommandHandler(
             var phoneResult = PhoneNumber.Create(request.PhoneNumber);
 
             if (phoneResult.IsError)
-                return Result<AuthResponseDto>.Failure(phoneResult.Errors);
+                return Result<RegisterGuestResponseDto>.Failure(phoneResult.Errors);
 
             phone = phoneResult.Value;
         }
@@ -52,21 +48,17 @@ public sealed class RegisterGuestCommandHandler(
         var phoneValue = phone?.Value;
 
         var matches = await _context.Guests
-            .Where(g =>
-                (g.Email != null && g.Email.Value.Value == email) ||
-                (phoneValue != null &&
-                 g.PhoneNumber != null &&
-                 g.PhoneNumber.Value.Value == phoneValue))
+            .Where(g => g.Email != null && g.Email.Value.Value == email)
             .Take(2)
             .ToListAsync(cancellationToken);
 
         if (matches.Count > 1)
-            return Result<AuthResponseDto>.Failure(GuestErrors.AmbiguousMatch);
+            return Result<RegisterGuestResponseDto>.Failure(GuestErrors.AmbiguousMatch);
 
         var guest = matches.SingleOrDefault();
 
         if (guest is not null && guest.UserId is not null)
-            return Result<AuthResponseDto>.Failure(ApplicationErrors.GuestErrors.AlreadyExists);
+            return Result<RegisterGuestResponseDto>.Failure(ApplicationErrors.GuestErrors.AlreadyExists);
 
         var isNewGuest = guest is null;
 
@@ -80,131 +72,65 @@ public sealed class RegisterGuestCommandHandler(
                 request.DateOfBirth);
 
             if (guestResult.IsError)
-                return Result<AuthResponseDto>.Failure(guestResult.Errors);
+                return Result<RegisterGuestResponseDto>.Failure(guestResult.Errors);
 
             guest = guestResult.Value;
         }
 
-        var userResult = await _identity.CreateUserAsync(
-            email,
-            request.Username,
-            request.Password,
-            request.FirstName,
-            request.LastName,
-            phoneValue,
-            Roles.Guest,
-            cancellationToken);
+        var createUserRequest = new CreateUserRequest(
+            UserName: request.Email,
+            Email: request.Email,
+            PhoneNumber: phoneValue,
+            FirstName: request.FirstName,
+            LastName: request.LastName,
+            Password: request.Password);
 
-        if (userResult.IsError)
-        {
-            _logger.LogWarning(
-                "Guest registration failed for {Email}: {Error}",
-                email,
-                userResult.TopError.Description);
 
-            return Result<AuthResponseDto>.Failure(userResult.Errors);
-        }
-
-        var user = userResult.Value;
-
-        var linkResult = guest.LinkToUserAccount(user.Id);
-
-        if (linkResult.IsError)
-        {
-            var deleteResult = await _identity.DeleteUserAsync(
-                user.Id, CancellationToken.None);
-
-            if (deleteResult.IsError)
-            {
-                _logger.LogCritical(
-                    "Could not delete identity user {UserId} after guest linking failed.",
-                    user.Id);
-            }
-
-            return Result<AuthResponseDto>.Failure(linkResult.Errors);
-        }
-
-        var accessTokenResult = _jwtService.Generate(user);
-
-        if (accessTokenResult.IsError)
-        {
-            var deleteResult = await _identity.DeleteUserAsync(
-                user.Id, CancellationToken.None);
-
-            if (deleteResult.IsError)
-            {
-                _logger.LogCritical(
-                    "Could not delete identity user {UserId} after access-token generation failed.",
-                    user.Id);
-            }
-
-            return Result<AuthResponseDto>.Failure(
-                accessTokenResult.Errors);
-        }
-
-        var refreshTokenResult = _refreshTokenService.Create(
-            user.Id,
-            request.DeviceName,
-            request.IpAddress);
-
-        if (refreshTokenResult.IsError)
-        {
-            var deleteResult = await _identity.DeleteUserAsync(
-                user.Id, CancellationToken.None);
-
-            if (deleteResult.IsError)
-            {
-                _logger.LogCritical(
-                    "Could not delete identity user {UserId} after refresh-token creation failed.",
-                    user.Id);
-            }
-
-            return Result<AuthResponseDto>.Failure(
-                refreshTokenResult.Errors);
-        }
-
-        if (isNewGuest)
-            _context.Guests.Add(guest);
-
-        _context.RefreshTokens.Add(refreshTokenResult.Value);
+        await using var tx = await _context.Database.BeginTransactionAsync(cancellationToken);
 
         try
         {
-            await _context.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(
-                ex,
-                "Application database save failed during registration for user {UserId}.",
-                user.Id);
+            var userResult = await _userService.CreateUserAsync(createUserRequest, cancellationToken);
 
-            var deleteResult = await _identity.DeleteUserAsync(
-                user.Id, CancellationToken.None);
-
-            if (deleteResult.IsError)
+            if (userResult.IsError)
             {
-                _logger.LogCritical(
-                    "Could not compensate for failed registration of user {UserId}.",
-                    user.Id);
+                return Result<RegisterGuestResponseDto>.Failure(userResult.Errors);
             }
 
-            return Result<AuthResponseDto>.Failure(
-                Error.Failure(
-                    "Register.SaveFailed",
-                    "Registration could not be completed. Please try again."));
+            var user = userResult.Value;
+
+            var roleResult = await _userService.AssignRoleAsync(user.Id, Roles.Guest, cancellationToken);
+
+            if (roleResult.IsError)
+            {
+                return Result<RegisterGuestResponseDto>.Failure(roleResult.Errors);
+            }
+
+
+            var linkResult = guest.LinkToUserAccount(user.Id);
+
+            if (linkResult.IsError)
+            {
+                return Result<RegisterGuestResponseDto>.Failure(linkResult.Errors);
+            }
+
+            if (isNewGuest) _context.Guests.Add(guest);
+
+            await _context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+        }
+        catch (System.Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Guest registration failed for {Email}", email);
+            return Result<RegisterGuestResponseDto>.Failure(
+                Error.Failure("Register.SaveFailed", "Registration could not be completed. Please try again."));
+
         }
 
-        _logger.LogInformation(
-            "Guest registration completed for user {UserId}, guest {GuestId}.",
-            user.Id,
-            guest.Id);
+        await _userService.SendEmailConfirmationAsync(email, cancellationToken);
 
-        return Result<AuthResponseDto>.Success(
-            new AuthResponseDto(
-                accessTokenResult.Value.Value,
-                refreshTokenResult.Value.Token,
-                accessTokenResult.Value.ExpiresAtUtc,
-                refreshTokenResult.Value.ExpiresOnUtc));
+        return Result<RegisterGuestResponseDto>.Success(
+            new RegisterGuestResponseDto(email, true)
+            );
     }
 }

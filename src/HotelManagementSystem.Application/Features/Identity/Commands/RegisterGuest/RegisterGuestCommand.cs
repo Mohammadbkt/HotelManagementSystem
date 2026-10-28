@@ -14,5 +14,5 @@ namespace HotelManagementSystem.Application.Features.Identity.Commands.RegisterG
         string? DeviceName,
         string? IpAddress,
         string? PhoneNumber = null
-    ) : IRequest<Result<AuthResponseDto>>;
+    ) : IRequest<Result<RegisterGuestResponseDto>>;
 }

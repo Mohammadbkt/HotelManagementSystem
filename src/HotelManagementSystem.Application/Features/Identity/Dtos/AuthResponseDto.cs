@@ -2,8 +2,9 @@ namespace HotelManagementSystem.Application.Features.Identity.Dtos
 {
     public sealed record AuthResponseDto(
     string AccessToken,
-    string RefreshToken ,
+    string RefreshToken,
     DateTimeOffset ExpiresOnUtc,
-    DateTimeOffset RefreshTokenExpiresOnUtc
+    DateTimeOffset RefreshTokenExpiresOnUtc,
+    AppUserDto User
     );
 }

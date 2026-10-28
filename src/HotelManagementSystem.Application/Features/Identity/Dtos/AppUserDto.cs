@@ -10,10 +10,10 @@ namespace HotelManagementSystem.Application.Features.Identity.Dtos
         string FirstName,
         string LastName,
         string Email, 
-        string Username,
+        string UserName,
         Guid? HotelId,
         string? PhoneNumber,
-        IReadOnlyCollection<string> Roles,
-        IReadOnlyCollection<string> Claims
+        bool IsActive,
+        IReadOnlyCollection<string> Roles
     );
 }

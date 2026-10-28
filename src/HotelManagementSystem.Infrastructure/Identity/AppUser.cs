@@ -8,7 +8,6 @@ namespace HotelManagementSystem.Infrastructure.Identity
     {
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
-
         public bool IsDeleted { get; set; }
         public DateTimeOffset? DeletedAt { get; private set; }
         public Guid? DeletedBy { get; private set; }
@@ -26,7 +25,7 @@ namespace HotelManagementSystem.Infrastructure.Identity
         {
             if (!IsDeleted) return;
 
-            IsDeleted = false; 
+            IsDeleted = false;
             DeletedAt = null;
             DeletedBy = null;
         }
