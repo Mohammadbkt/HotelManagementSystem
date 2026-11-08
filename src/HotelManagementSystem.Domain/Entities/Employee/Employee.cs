@@ -1,5 +1,6 @@
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
+using HotelManagementSystem.Domain.Entities.Guests;
 using HotelManagementSystem.Domain.ValueObjects.Email;
 using HotelManagementSystem.Domain.ValueObjects.PhoneNumber;
 
@@ -36,6 +37,7 @@ namespace HotelManagementSystem.Domain.Entities.Employee
 
         public static Result<Employee> Create(Guid hotelId, Guid userId, string firstName, string lastName, PhoneNumber? phoneNumber, EmailAddress emailAddress, DateOnly dateOfBirth, EmployeeRole role)
         {
+
             if (hotelId == Guid.Empty)
             {
                 return Result<Employee>.Failure(EmployeeErrors.HotelIdRequired);
@@ -56,17 +58,26 @@ namespace HotelManagementSystem.Domain.Entities.Employee
                 return Result<Employee>.Failure(EmployeeErrors.LastNameRequired);
             }
 
-            if (!Enum.IsDefined(role))
+            if (!Enum.IsDefined(typeof(EmployeeRole), role))
             {
                 return Result<Employee>.Failure(EmployeeErrors.RoleInvalid);
             }
+
+            if (dateOfBirth == default)
+                return Result<Employee>.Failure(EmployeeErrors.DateOfBirthRequired);
+
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            if (dateOfBirth > today || dateOfBirth < today.AddYears(-150))
+                return Result<Employee>.Failure(EmployeeErrors.DateOfBirthInvalid);
+
 
             return Result<Employee>.Success(new Employee(Guid.NewGuid(), hotelId, userId, firstName.Trim(), lastName.Trim(), phoneNumber, emailAddress, dateOfBirth, role));
         }
 
         public Result ChangeRole(EmployeeRole role)
         {
-            if (!Enum.IsDefined(role))
+            if (!Enum.IsDefined(typeof(EmployeeRole), role))
                 return Result.Failure(EmployeeErrors.RoleInvalid);
 
             Role = role;
@@ -84,7 +95,9 @@ namespace HotelManagementSystem.Domain.Entities.Employee
             if (dateOfBirth == default)
                 return Result.Failure(EmployeeErrors.DateOfBirthRequired);
 
-            if (dateOfBirth >= DateOnly.FromDateTime(DateTime.UtcNow))
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            if (dateOfBirth >= today || dateOfBirth < today.AddYears(-150))
                 return Result.Failure(EmployeeErrors.DateOfBirthInvalid);
 
             FirstName = firstName.Trim();
@@ -99,6 +112,15 @@ namespace HotelManagementSystem.Domain.Entities.Employee
             PhoneNumber = phoneNumber;
             EmailAddress = emailAddress;
             return Result.Success();
+        }
+
+        public override void Delete(Guid deletedBy)
+        {
+            if (IsDeleted) return;
+
+            base.Delete(deletedBy);
+            
+            AddDomainEvent(new EmployeeDeletedDomainEvent(Id, UserId, deletedBy));
         }
 
     }

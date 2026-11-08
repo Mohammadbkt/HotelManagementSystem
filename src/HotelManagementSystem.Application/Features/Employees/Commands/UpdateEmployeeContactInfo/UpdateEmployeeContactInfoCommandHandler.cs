@@ -64,7 +64,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.UpdateEm
 
             var duplicate = await _context.Employees.AnyAsync(
                 e => e.Id != request.EmployeeId && (e.EmailAddress.Value == emailString ||
-                 (phoneString != null && e.PhoneNumber != null && e.PhoneNumber.Value.Value == phoneString)),
+                 (phoneString != null && e.PhoneNumber != null && e.PhoneNumber.Value == phoneString)),
                 cancellationToken);
 
             if (duplicate)

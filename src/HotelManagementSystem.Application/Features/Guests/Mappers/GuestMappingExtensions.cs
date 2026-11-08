@@ -11,8 +11,8 @@ namespace HotelManagementSystem.Application.Features.Guests.Mappers
                 g.Id,
                 g.FirstName,
                 g.LastName,
-                g.Email != null ? g.Email.Value.Value : null,
-                g.PhoneNumber != null ? g.PhoneNumber.Value.Value : null,
+                g.Email != null ? g.Email.Value : null,
+                g.PhoneNumber != null ? g.PhoneNumber.Value : null,
                 g.DateOfBirth
             );
 

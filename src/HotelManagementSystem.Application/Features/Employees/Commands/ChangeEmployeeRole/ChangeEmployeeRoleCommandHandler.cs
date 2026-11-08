@@ -10,12 +10,12 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.ChangeEm
     public sealed class ChangeEmployeeRoleCommandHandler(
         IAppDbContext context,
         ILogger<ChangeEmployeeRoleCommandHandler> logger,
-        IIdentityService identityService)
+        IUserService userService)
         : IRequestHandler<ChangeEmployeeRoleCommand, Result>
     {
         private readonly IAppDbContext _context = context;
         private readonly ILogger<ChangeEmployeeRoleCommandHandler> _logger = logger;
-        private readonly IIdentityService _identityService = identityService;
+        private readonly IUserService _userService = userService;
 
         public async Task<Result> Handle(
             ChangeEmployeeRoleCommand request,
@@ -42,7 +42,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.ChangeEm
 
             if (employee.UserId is { } userId)
             {
-                var r = await _identityService.SetRoleAsync(userId, request.NewRole.ToString(), cancellationToken);
+                var r = await _userService.AssignRoleAsync(userId, request.NewRole.ToString(), cancellationToken);
                 if (r.IsError) return Result.Failure(r.Errors);
             }
 

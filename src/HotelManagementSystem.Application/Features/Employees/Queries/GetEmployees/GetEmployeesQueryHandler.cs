@@ -37,8 +37,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Queries.GetEmploy
             {
                 var term = request.PhoneNumber.Trim();
                 query = query.Where(e =>
-                    e.PhoneNumber.HasValue &&
-                    e.PhoneNumber.Value.Value.Contains(term));
+                        e.PhoneNumber != null && e.PhoneNumber.Value.Contains(term));
             }
 
             if (!string.IsNullOrWhiteSpace(request.Email))

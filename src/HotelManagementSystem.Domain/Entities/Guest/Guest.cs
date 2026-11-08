@@ -1,5 +1,6 @@
 using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
+using HotelManagementSystem.Domain.Entities.Guest;
 using HotelManagementSystem.Domain.ValueObjects.Email;
 using HotelManagementSystem.Domain.ValueObjects.PhoneNumber;
 
@@ -38,7 +39,6 @@ public sealed class Guest : SoftDeletableEntity
         PhoneNumber? phoneNumber,
         DateOnly dateOfBirth)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         if (email is null && phoneNumber is null)
             return Result<Guest>.Failure(GuestErrors.AtLeastOneContactRequired);
@@ -56,6 +56,8 @@ public sealed class Guest : SoftDeletableEntity
         if (lastName.Trim().Length > 50)
             return Result<Guest>.Failure(GuestErrors.LastNameTooLong);
 
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
         if (dateOfBirth > today || dateOfBirth < today.AddYears(-150))
             return Result<Guest>.Failure(GuestErrors.InvalidDateOfBirth);
 
@@ -70,7 +72,6 @@ public sealed class Guest : SoftDeletableEntity
 
     public Result UpdateInfo(string firstName, string lastName, DateOnly dateOfBirth)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         if (string.IsNullOrWhiteSpace(firstName))
             return Result.Failure(GuestErrors.FirstNameRequired);
@@ -83,6 +84,8 @@ public sealed class Guest : SoftDeletableEntity
 
         if (lastName.Trim().Length > 50)
             return Result.Failure(GuestErrors.LastNameTooLong);
+
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         if (dateOfBirth > today || dateOfBirth < today.AddYears(-150))
             return Result.Failure(GuestErrors.InvalidDateOfBirth);
@@ -109,10 +112,19 @@ public sealed class Guest : SoftDeletableEntity
 
     public Result LinkToUserAccount(Guid userId)
     {
+        if (userId == Guid.Empty)
+            return Result.Failure(GuestErrors.UserIdRequired);
         if (UserId is not null)
             return Result.Failure(GuestErrors.AlreadyLinkedToAccount);
 
         UserId = userId;
         return Result.Success();
+    }
+
+    public override void Delete(Guid deletedBy)
+    {
+        if (IsDeleted) return;
+        base.Delete(deletedBy);
+        AddDomainEvent(new GuestDeletedDomainEvent(Id, UserId, deletedBy));
     }
 }

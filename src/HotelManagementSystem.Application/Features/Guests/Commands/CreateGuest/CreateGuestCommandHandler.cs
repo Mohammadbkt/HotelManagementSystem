@@ -47,8 +47,8 @@ namespace HotelManagementSystem.Application.Features.Guests.Commands.CreateGuest
             if (email is not null || phone is not null)
             {
                 var duplicateExists = await _context.Guests.AnyAsync(g =>
-                    (email != null && g.Email != null && g.Email.Value.Value == email.Value.Value) ||
-                    (phone != null && g.PhoneNumber != null && g.PhoneNumber.Value.Value == phone.Value.Value),
+                    (email != null && g.Email != null && g.Email.Value == email.Value) ||
+                    (phone != null && g.PhoneNumber != null && g.PhoneNumber.Value == phone.Value),
                     cancellationToken);
 
                 if (duplicateExists)

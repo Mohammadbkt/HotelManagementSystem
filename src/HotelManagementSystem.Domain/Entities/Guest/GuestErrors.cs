@@ -7,6 +7,9 @@ public static class GuestErrors
     public static Error FirstNameRequired => Error.Validation(
         "Guest.FirstNameRequired",
         "First name is required.");
+    public static Error UserIdRequired => Error.Validation(
+        "Guest.UserIdRequired",
+        "User ID is required.");
 
     public static Error FirstNameTooLong => Error.Validation(
         "Guest.FirstNameTooLong",

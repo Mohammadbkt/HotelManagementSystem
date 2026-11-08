@@ -27,23 +27,23 @@ public sealed class GuestConfiguration : IEntityTypeConfiguration<Guest>
             .HasForeignKey<Guest>(g => g.UserId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        builder.ComplexProperty<PhoneNumber>(h => h.PhoneNumber, p =>
-        {
-            p.Property(x => x.Value)
-                .HasMaxLength(20)
-                .HasColumnName("Phone");
-        });
+        builder.Property(g => g.PhoneNumber)
+            .HasConversion(
+                phone => phone!.Value,
+                value => PhoneNumber.Create(value).Value)
+            .HasMaxLength(16)
+            .IsRequired();
 
-        builder.ComplexProperty<EmailAddress>(g => g.Email, e =>
-        {
-            e.Property(x => x.Value)
-             .HasMaxLength(254)
-             .HasColumnName("Email");
-        });
+        builder.Property(g => g.Email)
+                .HasConversion(
+                    email => email!.Value,
+                    value => EmailAddress.Create(value).Value)
+                .HasMaxLength(254)
+                .HasColumnName("Email")
+                .IsRequired();
 
         builder.Property(e => e.DateOfBirth)
             .IsRequired()
             .HasColumnType("date");
-
     }
 }

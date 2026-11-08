@@ -6,7 +6,8 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.CreateEm
 {
     public sealed record CreateEmployeeCommand(
         Guid HotelId,
-        Guid UserId,
+        string Email,
+        string Password,
         string FirstName,
         string LastName,
         string? PhoneNumber,

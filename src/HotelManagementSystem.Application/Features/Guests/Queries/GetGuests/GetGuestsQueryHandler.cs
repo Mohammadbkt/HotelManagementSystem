@@ -25,8 +25,8 @@ namespace HotelManagementSystem.Application.Features.Guests.Queries.GetGuests
                 query = query
                         .Where(g => g.FirstName.Contains(request.SearchTerm)
                             || g.LastName.Contains(request.SearchTerm)
-                            || (g.PhoneNumber != null && g.PhoneNumber.Value.Value.Contains(request.SearchTerm))
-                            || (g.Email != null && g.Email.Value.Value.Contains(request.SearchTerm)));
+                            || (g.PhoneNumber != null && g.PhoneNumber.Value.Contains(request.SearchTerm))
+                            || (g.Email != null && g.Email.Value.Contains(request.SearchTerm)));
 
 
             query = request.SortBy?.ToLowerInvariant() switch

@@ -10,14 +10,14 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.DeleteEm
     public sealed class DeleteEmployeeCommandHandler(
         IAppDbContext context,
         ICurrentUserService currentUser,
-        IIdentityService identity,
+        IUserService userService,
         ILogger<DeleteEmployeeCommandHandler> logger
         )
         : IRequestHandler<DeleteEmployeeCommand, Result>
     {
         private readonly IAppDbContext _context = context;
         private readonly ICurrentUserService _currentUser = currentUser;
-        private readonly IIdentityService _identity = identity;        
+        private readonly IUserService _userService = userService;
         private readonly ILogger<DeleteEmployeeCommandHandler> _logger = logger;
 
 
@@ -42,7 +42,7 @@ namespace HotelManagementSystem.Application.Features.Employees.Commands.DeleteEm
 
             employee.Delete(_currentUser.UserId ?? Guid.Empty);
 
-            var disable = await _identity.DeleteUserAsync(employee.UserId, cancellationToken); // or DeleteUserAsync
+            var disable = await _userService.DeactivateUserAsync(employee.UserId, cancellationToken);
             if (disable.IsError) return Result.Failure(disable.Errors);
 
             await _context.RefreshTokens

@@ -46,13 +46,14 @@ namespace HotelManagementSystem.Infrastructure.Data.Configurations
                     .HasColumnName("Phone");
             });
 
-            builder.ComplexProperty<EmailAddress>(g => g.EmailAddress, e =>
-        {
-            e.Property(x => x.Value)
-             .IsRequired(false)
-             .HasMaxLength(254)
-             .HasColumnName("Email");
-        });
+            builder.Property(e => e.EmailAddress)
+                    .HasConversion(
+                        v => v!.Value,
+                        v => EmailAddress.Create(v).Value)
+                    .HasMaxLength(254)
+                    .HasColumnName("Email")
+                    .IsRequired();
+
 
         }
     }
