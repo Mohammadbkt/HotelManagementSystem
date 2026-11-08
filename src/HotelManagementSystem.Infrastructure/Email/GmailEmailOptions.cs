@@ -9,4 +9,5 @@ public sealed class GmailEmailOptions
     public string FromEmail { get; init; } = string.Empty;
     public string Username { get; init; } = string.Empty;
     public string AppPassword { get; init; } = string.Empty;
+    public int TimeoutMs { get; set; } = 30_000;
 }

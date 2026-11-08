@@ -15,10 +15,19 @@ public static class DependencyInjection
         services.AddInfrastructure(configuration);
 
         services.AddProblemDetails();
-        
+
 
         services.AddControllers();
         services.AddOpenApi();
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy("Frontend", policy =>
+                policy.WithOrigins("http://localhost:5173")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials());
+        });
 
         return services;
     }

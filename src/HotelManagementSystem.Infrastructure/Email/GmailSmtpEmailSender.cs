@@ -32,10 +32,12 @@ public sealed class GmailSmtpEmailSender(
 
         using var client = new SmtpClient();
 
+        client.Timeout = config.TimeoutMs;
+
         await client.ConnectAsync(
             config.Host,
             config.Port,
-            SecureSocketOptions.StartTls,
+            SecureSocketOptions.SslOnConnect,
             cancellationToken);
 
         await client.AuthenticateAsync(

@@ -13,6 +13,17 @@ var app = builder.Build();
 await app.InitialiseDatabaseAsync(
     migrate: app.Environment.IsDevelopment());
 
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -20,20 +31,31 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-
-app.UseHttpsRedirection();
-
-app.MapControllers();
-app.UseExceptionHandler();
-app.UseStatusCodePages();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapPost("/send-email", async (IEmailSender emailSender, CancellationToken cancellationToken ) =>
+app.MapPost("/send-email", async (
+    IEmailSender emailSender,
+    ILogger<Program> logger,
+    CancellationToken cancellationToken) =>
 {
-    await emailSender.SendAsync(EmailAddress.Create("barakatmoe@proton.me").Value, "test", "test", cancellationToken );
-} 
-);
+    try
+    {
+        await emailSender.SendAsync(
+            EmailAddress.Create("2020980156@alumni.yu.edu.jo").Value,
+            "SMTP test",
+            "<p>This is a test email.</p>",
+            cancellationToken);
+
+        return Results.Ok(new { status = "sent" });
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Email test failed");
+
+        return Results.Problem(
+            title: "Email sending failed",
+            detail: app.Environment.IsDevelopment() ? ex.ToString() : null);
+    }
+});
+
 
 app.Run();
 

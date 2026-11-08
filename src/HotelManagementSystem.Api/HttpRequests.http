@@ -1,12 +1,20 @@
-@host = {{host}}
+@host = http://localhost:5030
 @token = {{token}}
 
-### ─────────────────────────────
-### GET all hotels (paginated)
-### ─────────────────────────────
-GET {{host}}/api/Hotel?page=1&pageSize=10
-Authorization: Bearer {{token}}
+POST {{host}}/api/auth/register
 Accept: application/json
+
+{
+  "email": "",
+  "username": "",
+  "password": "",
+  "firstName": "",
+  "lastName": "",
+  "dateOfBirth": "",
+  "deviceName": null,
+  "ipAddress": null,
+  "phoneNumber": null
+}
 
 ### ─────────────────────────────
 ### GET hotel by id
