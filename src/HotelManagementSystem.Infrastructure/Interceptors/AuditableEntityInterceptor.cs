@@ -7,7 +7,7 @@ namespace HotelManagementSystem.Infrastructure.Interceptors
 {
     public sealed class AuditableEntityInterceptor(ICurrentUserService user, TimeProvider timeProvider) : SaveChangesInterceptor
     {
-        private readonly ICurrentUserService _user = user;
+        private readonly ICurrentUserService _user = user;  
         private readonly TimeProvider _timeProvider = timeProvider;
 
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)

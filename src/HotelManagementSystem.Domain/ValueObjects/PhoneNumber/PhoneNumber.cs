@@ -5,8 +5,13 @@ using HotelManagementSystem.Domain.Common.Result;
 
 namespace HotelManagementSystem.Domain.ValueObjects.PhoneNumber
 {
-    public readonly record struct PhoneNumber
+    public sealed record PhoneNumber
     {
+        private static readonly Regex E164Regex = new(
+        @"^\+[1-9]\d{6,14}$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        TimeSpan.FromMilliseconds(100));
+
         public string Value { get; }
 
         private PhoneNumber(string value)
@@ -23,27 +28,16 @@ namespace HotelManagementSystem.Domain.ValueObjects.PhoneNumber
 
             value = value.Trim();
 
-            if (!Regex.IsMatch(value, @"^[\d\s\-\(\)\+]+$"))
+            var normalized = new string(value
+            .Where(c => char.IsDigit(c) || c == '+')
+            .ToArray());
+
+            if (!E164Regex.IsMatch(normalized))
             {
                 return Result<PhoneNumber>.Failure(PhoneNumberErrors.InvalidFormat);
             }
-
-            var digitsOnly = new string(
-                value.Where(char.IsDigit).ToArray());
-
-            if (digitsOnly.Length < 7 || digitsOnly.Length > 15)
-            {
-                return Result<PhoneNumber>.Failure(PhoneNumberErrors.InvalidLength);
-            }
-
-            if (!value.StartsWith('+'))
-            {
-                return Result<PhoneNumber>.Failure(PhoneNumberErrors.MissingCountryCode);
-            }
-
-            var normalizedValue = $"+{digitsOnly}";
-
-            return Result<PhoneNumber>.Success(new PhoneNumber(normalizedValue));
+            
+            return Result<PhoneNumber>.Success(new PhoneNumber(normalized));
         }
 
         public override string ToString() => Value;

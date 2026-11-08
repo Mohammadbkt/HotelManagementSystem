@@ -17,7 +17,7 @@ namespace HotelManagementSystem.Domain.Common
         protected SoftDeletableEntity() { }
         protected SoftDeletableEntity(Guid id) : base(id) { }
 
-        public void Delete(Guid deletedBy)
+        public virtual void Delete(Guid deletedBy)
         {
 
             if (IsDeleted)
@@ -28,7 +28,7 @@ namespace HotelManagementSystem.Domain.Common
             DeletedBy = deletedBy;
         }
 
-        public void Restore()
+        public virtual void Restore()
         {
             if (!IsDeleted)
                 return;

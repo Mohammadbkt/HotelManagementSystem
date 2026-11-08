@@ -4,8 +4,13 @@ using HotelManagementSystem.Domain.Common.Result;
 
 namespace HotelManagementSystem.Domain.ValueObjects.Email
 {
-    public readonly record struct EmailAddress
+    public sealed record EmailAddress
     {
+        private static readonly Regex EmailRegex = new(
+        @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        TimeSpan.FromMilliseconds(100));
+
         public string Value { get; }
 
         private EmailAddress(string value)
@@ -27,10 +32,7 @@ namespace HotelManagementSystem.Domain.ValueObjects.Email
                 return Result<EmailAddress>.Failure(EmailAddressErrors.TooLong);
             }
 
-            if (!Regex.IsMatch(
-                    value,
-                    @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-                    RegexOptions.CultureInvariant))
+            if (!EmailRegex.IsMatch(value))
             {
                 return Result<EmailAddress>.Failure(EmailAddressErrors.InvalidFormat);
             }
