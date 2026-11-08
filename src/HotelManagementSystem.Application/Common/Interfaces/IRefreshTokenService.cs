@@ -1,10 +1,12 @@
 using HotelManagementSystem.Domain.Common.Result;
-using HotelManagementSystem.Domain.Entities.Identity;
 
 namespace HotelManagementSystem.Application.Common.Interfaces;
 
 public interface IRefreshTokenService
 {
-    Result<RefreshToken> Create(Guid userId, string? deviceName, string? ipAddress);
+    Task<Result<IssuedRefreshToken>> CreateAsync(Guid userId, string? deviceName, string? ipAddress, CancellationToken ct);
 
+    Task<Result> RevokeAsync(string rawToken, CancellationToken ct);
+
+    Task<Result> RevokeAllForUserAsync(Guid userId, CancellationToken ct);
 }

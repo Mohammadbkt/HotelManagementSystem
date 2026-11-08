@@ -183,6 +183,9 @@ public sealed class Invoice : AuditableEntity
 
         var total = afterDiscount.Value.Add(TaxAmount);
 
+        if (total.Value.IsNegative) 
+            return Result.Failure(InvoiceErrors.DiscountExceedsSubtotal);
+
         if (total.IsError)
             return Result.Failure(total.Errors);
 
@@ -199,9 +202,8 @@ public sealed class Invoice : AuditableEntity
         if (_lineItems.Count == 0)
             return Result.Failure(InvoiceErrors.CannotModifyEmptyInvoice);
 
-
-        if (discount.Currency != SubTotal.Currency)
-            return Result.Failure(MoneyErrors.CurrencyMismatch);
+        if (discount.IsNegative || discount.Amount > SubTotal.Amount)
+            return Result.Failure(InvoiceErrors.DiscountExceedsSubtotal);
 
         if (SubTotal.Subtract(discount).IsError)
             return Result.Failure(InvoiceErrors.DiscountExceedsSubtotal);

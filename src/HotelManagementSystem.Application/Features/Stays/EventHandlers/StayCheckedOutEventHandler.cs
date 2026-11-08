@@ -11,7 +11,7 @@ namespace HotelManagementSystem.Application.Features.Stays.EventHandlers;
 public sealed class StayCheckedOutEventHandler(IAppDbContext context, ILogger<StayCheckedOutEventHandler> logger) : INotificationHandler<StayCheckedOutEvent>
 {
     private readonly IAppDbContext _context = context;
-    private readonly ILogger _logger = logger;
+    private readonly ILogger _logger = logger; 
 
     public async Task Handle(StayCheckedOutEvent notification, CancellationToken cancellationToken)
     {
@@ -38,7 +38,9 @@ public sealed class StayCheckedOutEventHandler(IAppDbContext context, ILogger<St
             return;
         }
 
-        var invoiceResult = InvoiceGenerationService.BuildFromStay(stay, category);
+        var reservation = await _context.Reservations.FindAsync([stay.ReservationId], cancellationToken);
+
+        var invoiceResult = InvoiceGenerationService.BuildFromStay(stay, category, reservation);
         if (invoiceResult.IsError)
         {
             _logger.LogWarning("Draft invoice not created for stay {StayId}: {Errors}",

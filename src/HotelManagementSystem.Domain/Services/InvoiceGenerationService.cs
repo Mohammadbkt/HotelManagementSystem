@@ -1,5 +1,6 @@
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Billing;
+using HotelManagementSystem.Domain.Entities.Reservations;
 using HotelManagementSystem.Domain.Entities.Rooms.RoomCategories;
 using HotelManagementSystem.Domain.Entities.Stays;
 
@@ -7,17 +8,26 @@ namespace HotelManagementSystem.Domain.Services;
 
 public static class InvoiceGenerationService
 {
-    public static Result<Invoice> BuildFromStay(Stay stay, RoomCategory category)
+    public static Result<Invoice> BuildFromStay(Stay stay, RoomCategory category, Reservation? reservation)
     {
         if (!stay.CheckOutDate.HasValue)
             return Result<Invoice>.Failure(StayErrors.NotCheckedOutYet);
 
-        var nights = Math.Max(1,
-       (stay.CheckOutDate.Value.UtcDateTime.Date - stay.CheckInDate.UtcDateTime.Date).Days);
+        var checkIn = stay.CheckInDate.Date;
+        var checkOut = stay.CheckOutDate.Value.Date;
+
+        if (checkOut <= checkIn)
+            return Result<Invoice>.Failure(StayErrors.InvalidCheckOutTime);
+
+        var nights = (checkOut - checkIn).Days;
+
+        var nightlyRate = reservation is not null
+                        ? reservation.BasePricePerNight
+                        : category.BasePricePerNight;
 
         var invoiceResult = Invoice.Create(
             stay.Id,
-            category.BasePricePerNight.Currency);
+            nightlyRate.Currency);
 
         if (invoiceResult.IsError)
             return Result<Invoice>.Failure(invoiceResult.Errors);
@@ -27,7 +37,7 @@ public static class InvoiceGenerationService
         var lineItemResult = invoice.AddLineItem(
             $"Room charge ({category.Name})",
             nights,
-            category.BasePricePerNight);
+            nightlyRate);
 
         if (lineItemResult.IsError)
             return Result<Invoice>.Failure(lineItemResult.Errors);

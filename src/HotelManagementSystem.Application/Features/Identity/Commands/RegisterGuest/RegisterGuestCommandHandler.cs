@@ -44,11 +44,13 @@ public sealed class RegisterGuestCommandHandler(
             phone = phoneResult.Value;
         }
 
-        var email = emailResult.Value.Value;
+        var email = emailResult.Value;
         var phoneValue = phone?.Value;
 
+
+
         var matches = await _context.Guests
-            .Where(g => g.Email != null && g.Email.Value.Value == email)
+            .Where(g => g.Email != null && g.Email == emailResult.Value)
             .Take(2)
             .ToListAsync(cancellationToken);
 
@@ -127,10 +129,10 @@ public sealed class RegisterGuestCommandHandler(
 
         }
 
-        await _userService.SendEmailConfirmationAsync(email, cancellationToken);
+        await _userService.SendEmailConfirmationAsync(email.Value, cancellationToken);
 
         return Result<RegisterGuestResponseDto>.Success(
-            new RegisterGuestResponseDto(email, true)
+            new RegisterGuestResponseDto(email.Value, true)
             );
     }
 }

@@ -35,6 +35,8 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.CreateInvo
                 return Result<Guid>.Failure(ApplicationErrors.Invoice.GuestMismatch);
             }
 
+            var reservation = await _context.Reservations.FindAsync([stay.ReservationId], cancellationToken);
+
             var alreadyExists = await _context.Invoices
             .AnyAsync(i => i.StayId == request.StayId && i.Status != InvoiceStatus.Cancelled, cancellationToken);
 
@@ -69,7 +71,7 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.CreateInvo
                 return Result<Guid>.Failure(ApplicationErrors.RoomCategory.NotFound);
             }
 
-            var invoiceResult = InvoiceGenerationService.BuildFromStay(stay, roomCategory);
+            var invoiceResult = InvoiceGenerationService.BuildFromStay(stay, roomCategory, reservation);
             if (invoiceResult.IsError)
             {
                 _logger.LogWarning(

@@ -122,10 +122,21 @@ public static class ApplicationErrors
 
     public static class Reservation
     {
+        
         public static readonly Error NotFound =
             Error.NotFound(
                 "Reservation.NotFound",
                 "Reservation not found.");
+        
+        public static readonly Error InvalidCheckOutDate =
+            Error.NotFound(
+                "Reservation.InvalidCheckOutDate",
+                "Invalid check out date.");
+
+        public static readonly Error RoomNotAssigned =
+            Error.NotFound(
+                "Reservation.RoomNotAssigned",
+                "Room not assigned."); 
 
         public static readonly Error AlreadyExists =
             Error.Conflict(
@@ -295,6 +306,17 @@ public static class ApplicationErrors
     public static class Auth
     {
 
+        public static readonly Error LockedOut =
+        Error.Failure(
+            "Auth.LockedOut", 
+            "Account is locked out"
+        );
+
+        public static readonly Error RoleNotExists = 
+        Error.NotFound(
+            "Auth.RoleNotExists",
+            "Role not exists");
+
         public static readonly Error NotAuthenticated =
             Error.Unauthorized(
                 "Auth.NotAuthenticated",
@@ -310,10 +332,17 @@ public static class ApplicationErrors
                 "Auth.InvalidRefreshToken",
                 "The refresh token is invalid or expired.");
 
+        public static readonly Error InvalidToken =
+            Error.Unauthorized(
+                "Auth.InvalidToken",
+                "The token is invalid or expired.");
+
         public static readonly Error UserNotFound =
             Error.NotFound(
                 "Auth.UserNotFound",
                 "User not found.");
+
+    
 
         public static readonly Error EmailAlreadyExists =
             Error.Conflict(
