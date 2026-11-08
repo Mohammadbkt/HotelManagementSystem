@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelManagementSystem.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261028220745_InitialMigration")]
+    [Migration("20261029141806_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -278,6 +278,12 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("EmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)")
+                        .HasColumnName("Email");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -306,16 +312,6 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "EmailAddress", "HotelManagementSystem.Domain.Entities.Employee.Employee.EmailAddress#EmailAddress", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<string>("Value")
-                                .HasMaxLength(254)
-                                .HasColumnType("nvarchar(254)")
-                                .HasColumnName("Email");
-                        });
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "PhoneNumber", "HotelManagementSystem.Domain.Entities.Employee.Employee.PhoneNumber#PhoneNumber", b1 =>
                         {
@@ -356,6 +352,12 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)")
+                        .HasColumnName("Email");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -375,26 +377,13 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Email", "HotelManagementSystem.Domain.Entities.Guests.Guest.Email#EmailAddress", b1 =>
-                        {
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(254)
-                                .HasColumnType("nvarchar(254)")
-                                .HasColumnName("Email");
-                        });
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "PhoneNumber", "HotelManagementSystem.Domain.Entities.Guests.Guest.PhoneNumber#PhoneNumber", b1 =>
-                        {
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)")
-                                .HasColumnName("Phone");
-                        });
 
                     b.HasKey("Id");
 
