@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/HotelManagementSystem.Api/HotelManagementSystem.Api.csproj" />
+    <Project Path="src/HotelManagementSystem.Application/HotelManagementSystem.Application.csproj" />
+    <Project Path="src/HotelManagementSystem.Domain/HotelManagementSystem.Domain.csproj" />
+    <Project Path="src/HotelManagementSystem.Infrastructure/HotelManagementSystem.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/HotelManagementSystem.Api.IntegrationTests/HotelManagementSystem.Api.IntegrationTests.csproj" />
+    <Project Path="tests/HotelManagementSystem.Application.Subcutaneous/HotelManagementSystem.Application.Subcutaneous.csproj" />
+    <Project Path="tests/HotelManagementSystem.Application.UnitTests/HotelManagementSystem.Application.UnitTests.csproj" />
+    <Project Path="tests/HotelManagementSystem.Domain.UnitTests/HotelManagementSystem.Domain.UnitTests.csproj" />
+    <Project Path="tests/HotelManagementSystem.Tests.Common/HotelManagementSystem.Tests.Common.csproj" />
+  </Folder>
+ </Solution>

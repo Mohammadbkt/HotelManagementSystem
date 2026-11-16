@@ -20,16 +20,21 @@ public sealed class LoggingBehavior<TRequest, TResponse>(
         CancellationToken cancellationToken)
     {
         var requestName = typeof(TRequest).Name;
-        var userId = _currentUser.UserId ?? Guid.Empty;
+        var userId = _currentUser.UserId;
 
         var started = Stopwatch.GetTimestamp();
 
-        var response = await next(cancellationToken);
+        try
+        {
+            return await next(cancellationToken);
+        }
+        finally
+        {
+            var elapsed = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
 
-        var elapsed = Stopwatch.GetElapsedTime(started);
-
-        _logger.LogInformation("Handled {RequestName} in {ElapsedMs:F2} ms by user {UserId}",requestName, elapsed.TotalMilliseconds, userId);
-
-        return response;
+            _logger.LogInformation(
+                "Handled {RequestName} in {ElapsedMs:F2} ms by user {UserId}",
+                requestName, elapsed, userId);
+        }
     }
 }
