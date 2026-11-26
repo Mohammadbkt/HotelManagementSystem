@@ -2,6 +2,7 @@ using HotelManagementSystem.Application.Common.Errors;
 using HotelManagementSystem.Application.Common.Interfaces;
 using HotelManagementSystem.Domain.Common.Result;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace HotelManagementSystem.Application.Features.Billing.Commands.IssueInvoice
@@ -13,14 +14,17 @@ namespace HotelManagementSystem.Application.Features.Billing.Commands.IssueInvoi
 
         public async Task<Result> Handle(IssueInvoiceCommand request, CancellationToken cancellationToken)
         {
-            var invoice = await _context.Invoices.FindAsync([request.InvoiceId], cancellationToken);
+            var invoice = await _context.Invoices
+                .Include(i => i.LineItems)
+                .SingleOrDefaultAsync(i => i.Id == request.InvoiceId, cancellationToken);
+
             if (invoice is null)
             {
                 _logger.LogWarning("Invoice {InvoiceId} not found", request.InvoiceId);
 
                 return Result.Failure(ApplicationErrors.Invoice.NotFound);
             }
-            var invoiceResult = invoice.Issue(invoice.Number!, DateTimeOffset.UtcNow);
+            var invoiceResult = invoice.Issue(DateTimeOffset.UtcNow);
             if (invoiceResult.IsError)
             {
                 _logger.LogWarning(

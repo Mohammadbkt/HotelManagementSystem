@@ -1,8 +1,6 @@
 using HotelManagementSystem.Domain.Entities.Billing;
 using HotelManagementSystem.Domain.Entities.Billing.Payments;
-using HotelManagementSystem.Domain.Entities.Guests;
-using HotelManagementSystem.Domain.Entities.Hotels;
-using HotelManagementSystem.Domain.Entities.Stays;
+using HotelManagementSystem.Domain.ValueObjects.Invoicing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,6 +18,12 @@ public sealed class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             .HasConversion<string>()
             .HasMaxLength(20)
             .IsRequired();
+
+        builder.Property(i => i.Number)
+            .HasConversion(
+                invoiceNumber => invoiceNumber.Value,
+                value => InvoiceNumber.Create(value)
+            );
 
         builder.Property(i => i.IssuedAt);
         builder.Property(i => i.PaidAt);
@@ -57,6 +61,7 @@ public sealed class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
 
         builder.HasIndex(i => i.StayId).IsUnique(true);
         builder.HasIndex(i => i.Status);
+        builder.HasIndex(i => i.Number).IsUnique(true);
 
         builder.Ignore(i => i.DomainEvents);
     }

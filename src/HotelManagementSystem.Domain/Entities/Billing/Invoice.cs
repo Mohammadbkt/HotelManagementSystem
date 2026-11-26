@@ -2,6 +2,7 @@ using HotelManagementSystem.Domain.Common;
 using HotelManagementSystem.Domain.Common.Result;
 using HotelManagementSystem.Domain.Entities.Billing.Payments;
 using HotelManagementSystem.Domain.Entities.Stays;
+using HotelManagementSystem.Domain.ValueObjects.Invoicing;
 using HotelManagementSystem.Domain.ValueObjects.Money;
 
 namespace HotelManagementSystem.Domain.Entities.Billing;
@@ -14,7 +15,7 @@ public sealed class Invoice : AuditableEntity
         => _lineItems.AsReadOnly();
 
     public Guid StayId { get; private set; }
-    public string? Number { get; private set; }
+    public InvoiceNumber Number { get; private set; }
 
     public DateTimeOffset? IssuedAt { get; private set; }
     public DateTimeOffset? PaidAt { get; private set; }
@@ -37,10 +38,12 @@ public sealed class Invoice : AuditableEntity
     private Invoice(
         Guid id,
         Guid stayId,
+        InvoiceNumber number,
         string currencyCode)
         : base(id)
     {
         StayId = stayId;
+        Number = number;
         Status = InvoiceStatus.Draft;
 
         SubTotal = Money.Zero(currencyCode);
@@ -60,6 +63,7 @@ public sealed class Invoice : AuditableEntity
         return Result<Invoice>.Success(new Invoice(
             Guid.NewGuid(),
             stayId,
+            InvoiceNumber.Generate(),
             currencyCode));
     }
 
@@ -93,13 +97,10 @@ public sealed class Invoice : AuditableEntity
         return Result.Success();
     }
 
-    public Result Issue(string invoiceNumber, DateTimeOffset issuedAt)
+    public Result Issue(DateTimeOffset issuedAt)
     {
         if (Status != InvoiceStatus.Draft)
             return Result.Failure(InvoiceErrors.CannotIssue);
-
-        if (string.IsNullOrWhiteSpace(invoiceNumber))
-            return Result.Failure(InvoiceErrors.InvalidInvoiceNumber);
 
         if (issuedAt == default)
             return Result.Failure(InvoiceErrors.InvalidIssuedAt);
@@ -108,7 +109,6 @@ public sealed class Invoice : AuditableEntity
             return Result.Failure(InvoiceErrors.EmptyInvoice);
 
 
-        Number = invoiceNumber.Trim();
         IssuedAt = issuedAt;
         Status = InvoiceStatus.Issued;
 

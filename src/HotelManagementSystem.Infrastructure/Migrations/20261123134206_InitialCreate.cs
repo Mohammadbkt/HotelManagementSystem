@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace HotelManagementSystem.Infrastructure.Data.Migrations
+namespace HotelManagementSystem.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -450,7 +450,7 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StayId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Number = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IssuedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     PaidAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -552,6 +552,12 @@ namespace HotelManagementSystem.Infrastructure.Data.Migrations
                 name: "IX_InvoiceLineItems_InvoiceId_LineNumber",
                 table: "InvoiceLineItems",
                 columns: new[] { "InvoiceId", "LineNumber" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Invoices_Number",
+                table: "Invoices",
+                column: "Number",
                 unique: true);
 
             migrationBuilder.CreateIndex(
